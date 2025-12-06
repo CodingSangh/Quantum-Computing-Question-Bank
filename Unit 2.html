@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIT 2: Quantum Logic Gates and Circuits</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --gradient-3: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question-number {
+            background: var(--gradient-1);
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .question-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+        }
+
+        .answer-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: var(--primary-light);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 25px 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--gradient-2);
+            border-radius: 2px;
+        }
+
+        .gate-section {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .gate-section h4 {
+            color: var(--secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gate-section h4::before {
+            content: '⚛';
+            font-size: 1.2rem;
+        }
+
+        ul {
+            list-style: none;
+            margin: 10px 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 24px;
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        ul li strong {
+            color: var(--text-primary);
+        }
+
+        .matrix-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .diagram-container {
+            background: linear-gradient(135deg, #1a1f35 0%, #0d1321 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .diagram-title {
+            color: var(--accent);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diagram-title::before {
+            content: '📊';
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid #30363d;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-block .comment {
+            color: #8b949e;
+        }
+
+        .code-block .keyword {
+            color: #ff7b72;
+        }
+
+        .code-block .function {
+            color: #d2a8ff;
+        }
+
+        .code-block .string {
+            color: #a5d6ff;
+        }
+
+        .code-block .number {
+            color: #79c0ff;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            border-radius: 0 8px 8px 0;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .success-box {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success);
+            border-radius: 0 8px 8px 0;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .step-list {
+            counter-reset: step;
+        }
+
+        .step-list li {
+            counter-increment: step;
+            padding-left: 40px;
+        }
+
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--gradient-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .implications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .implication-card {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .implication-card h5 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .implication-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                padding: 40px 15px;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
+            .question-header {
+                flex-direction: column;
+            }
+
+            .diagram-container {
+                padding: 15px;
+            }
+
+            .implications-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* MathJax overrides */
+        mjx-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+        }
+
+        .MathJax {
+            font-size: 1.1em !important;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚛️ Quantum Gates & Circuits</h1>
+        <p>A comprehensive guide to understanding quantum gates, their mathematical representations, and geometric interpretations</p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Question 1 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q1</span>
+                <h2 class="question-title">Describe basic single-qubit gates (X, Y, Z, H, S, T). Provide their matrices and explain their geometric interpretations.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+                
+                <p>Single-qubit gates are unitary operators that manipulate the state of a single qubit. Geometrically, they correspond to rotations of the state vector on the Bloch sphere.</p>
+
+                <!-- Pauli-X Gate -->
+                <div class="gate-section">
+                    <h4>1. Pauli-X Gate (Bit-Flip Gate)</h4>
+                    <ul>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[X = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}\]
+                            </div>
+                        </li>
+                        <li><strong>Action:</strong> It swaps the amplitudes of \(|0\rangle\) and \(|1\rangle\).
+                            \[X|0\rangle = |1\rangle, \quad X|1\rangle = |0\rangle\]
+                        </li>
+                        <li><strong>Geometric Interpretation:</strong> Corresponds to a <strong>rotation of 180° (π) around the X-axis</strong> of the Bloch sphere. It maps the North Pole (\(|0\rangle\)) to the South Pole (\(|1\rangle\)).</li>
+                    </ul>
+                </div>
+
+                <!-- Pauli-Y Gate -->
+                <div class="gate-section">
+                    <h4>2. Pauli-Y Gate</h4>
+                    <ul>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[Y = \begin{bmatrix} 0 & -i \\ i & 0 \end{bmatrix}\]
+                            </div>
+                        </li>
+                        <li><strong>Action:</strong> It performs a combined bit-flip and phase shift.
+                            \[Y|0\rangle = i|1\rangle, \quad Y|1\rangle = -i|0\rangle\]
+                        </li>
+                        <li><strong>Geometric Interpretation:</strong> Corresponds to a <strong>rotation of 180° (π) around the Y-axis</strong>.</li>
+                    </ul>
+                </div>
+
+                <!-- Pauli-Z Gate -->
+                <div class="gate-section">
+                    <h4>3. Pauli-Z Gate (Phase-Flip Gate)</h4>
+                    <ul>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[Z = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}\]
+                            </div>
+                        </li>
+                        <li><strong>Action:</strong> It leaves \(|0\rangle\) unchanged but adds a phase of \(-1\) to \(|1\rangle\).
+                            \[Z|0\rangle = |0\rangle, \quad Z|1\rangle = -|1\rangle\]
+                        </li>
+                        <li><strong>Geometric Interpretation:</strong> Corresponds to a <strong>rotation of 180° (π) around the Z-axis</strong>. It spins the Bloch vector along the equator without changing its latitude.</li>
+                    </ul>
+                </div>
+
+                <!-- Hadamard Gate -->
+                <div class="gate-section">
+                    <h4>4. Hadamard Gate (H)</h4>
+                    <ul>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}\]
+                            </div>
+                        </li>
+                        <li><strong>Action:</strong> It creates a superposition state from basis states.
+                            \[H|0\rangle = |+\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}, \quad H|1\rangle = |-\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}\]
+                        </li>
+                        <li><strong>Geometric Interpretation:</strong> Corresponds to a <strong>rotation of 180° (π) around the diagonal axis</strong> between X and Z axes \(\left(\hat{n} = \frac{\hat{x}+\hat{z}}{\sqrt{2}}\right)\). It transforms the Z-basis into the X-basis.</li>
+                    </ul>
+                </div>
+
+                <!-- Phase Gate -->
+                <div class="gate-section">
+                    <h4>5. Phase Gate (S)</h4>
+                    <ul>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[S = \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & e^{i\pi/2} \end{bmatrix}\]
+                            </div>
+                        </li>
+                        <li><strong>Action:</strong> It adds a phase of \(i\) (90°) to the \(|1\rangle\) component.</li>
+                        <li><strong>Geometric Interpretation:</strong> Corresponds to a <strong>rotation of 90° (π/2) around the Z-axis</strong>. It is the square root of the Z gate \((S^2 = Z)\).</li>
+                    </ul>
+                </div>
+
+                <!-- T Gate -->
+                <div class="gate-section">
+                    <h4>6. T Gate (π/8 Gate)</h4>
+                    <ul>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[T = \begin{bmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{bmatrix}\]
+                            </div>
+                        </li>
+                        <li><strong>Action:</strong> It adds a phase of \(e^{i\pi/4}\) (45°) to the \(|1\rangle\) component.</li>
+                        <li><strong>Geometric Interpretation:</strong> Corresponds to a <strong>rotation of 45° (π/4) around the Z-axis</strong>. It is the square root of the S gate \((T^2 = S)\).</li>
+                    </ul>
+                </div>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Geometric Rotations on Bloch Sphere</div>
+                    <svg width="650" height="280" viewBox="0 0 650 280" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#ef4444"/>
+                            </marker>
+                            <linearGradient id="sphereGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#334155;stop-opacity:0.3"/>
+                                <stop offset="100%" style="stop-color:#1e293b;stop-opacity:0.1"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- X Gate -->
+                        <g transform="translate(50, 35)">
+                            <text x="75" y="0" font-family="Inter" font-size="13" font-weight="600" fill="#a5b4fc" text-anchor="middle">X Gate (180° about X)</text>
+                            <circle cx="75" cy="100" r="65" stroke="#475569" fill="url(#sphereGrad)" stroke-width="2"/>
+                            <ellipse cx="75" cy="100" rx="65" ry="22" stroke="#64748b" fill="none" stroke-dasharray="4,4"/>
+                            <line x1="75" y1="35" x2="75" y2="165" stroke="#64748b" stroke-width="1.5"/>
+                            <circle cx="75" cy="35" r="6" fill="#06b6d4"/>
+                            <text x="90" y="32" font-size="12" fill="#06b6d4" font-family="Inter">|0⟩</text>
+                            <circle cx="75" cy="165" r="6" fill="#f59e0b"/>
+                            <text x="90" y="172" font-size="12" fill="#f59e0b" font-family="Inter">|1⟩</text>
+                            <path d="M 75 40 Q 10 100 75 160" stroke="#ef4444" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+                        </g>
+
+                        <!-- Z Gate -->
+                        <g transform="translate(230, 35)">
+                            <text x="75" y="0" font-family="Inter" font-size="13" font-weight="600" fill="#a5b4fc" text-anchor="middle">Z Gate (180° about Z)</text>
+                            <circle cx="75" cy="100" r="65" stroke="#475569" fill="url(#sphereGrad)" stroke-width="2"/>
+                            <ellipse cx="75" cy="100" rx="65" ry="22" stroke="#64748b" fill="none" stroke-dasharray="4,4"/>
+                            <line x1="75" y1="35" x2="75" y2="165" stroke="#64748b" stroke-width="1.5"/>
+                            <line x1="75" y1="100" x2="140" y2="100" stroke="#06b6d4" stroke-width="2.5"/>
+                            <circle cx="140" cy="100" r="5" fill="#06b6d4"/>
+                            <text x="150" y="105" font-size="12" fill="#06b6d4" font-family="Inter">|+⟩</text>
+                            <path d="M 135 100 A 60 22 0 0 1 15 100" stroke="#ef4444" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+                            <circle cx="10" cy="100" r="5" fill="#f59e0b"/>
+                            <text x="-10" y="105" font-size="12" fill="#f59e0b" font-family="Inter">|-⟩</text>
+                        </g>
+
+                        <!-- H Gate -->
+                        <g transform="translate(430, 35)">
+                            <text x="75" y="0" font-family="Inter" font-size="13" font-weight="600" fill="#a5b4fc" text-anchor="middle">H Gate (|0⟩ → |+⟩)</text>
+                            <circle cx="75" cy="100" r="65" stroke="#475569" fill="url(#sphereGrad)" stroke-width="2"/>
+                            <ellipse cx="75" cy="100" rx="65" ry="22" stroke="#64748b" fill="none" stroke-dasharray="4,4"/>
+                            <line x1="75" y1="35" x2="75" y2="165" stroke="#64748b" stroke-width="1.5"/>
+                            <line x1="75" y1="100" x2="140" y2="100" stroke="#64748b" stroke-dasharray="4,4"/>
+                            <circle cx="75" cy="40" r="6" fill="#06b6d4"/>
+                            <text x="58" y="30" font-size="12" fill="#06b6d4" font-family="Inter">|0⟩</text>
+                            <path d="M 75 45 Q 115 55 135 95" stroke="#ef4444" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+                            <circle cx="140" cy="100" r="5" fill="#10b981"/>
+                            <text x="150" y="105" font-size="12" fill="#10b981" font-family="Inter">|+⟩</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 2 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q2</span>
+                <h2 class="question-title">Explain multi-qubit gates such as CNOT, Toffoli, and Swap. Show how they create entanglement and perform controlled operations.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+                
+                <p>Multi-qubit gates operate on two or more qubits simultaneously. They are essential for interacting qubits to perform conditional logic and generate entanglement.</p>
+
+                <!-- CNOT Gate -->
+                <div class="gate-section">
+                    <h4>1. CNOT (Controlled-NOT) Gate</h4>
+                    <ul>
+                        <li><strong>Description:</strong> The CNOT is a two-qubit gate with a <strong>Control Qubit</strong> and a <strong>Target Qubit</strong>. It performs a NOT (X) operation on the target qubit <em>only if</em> the control qubit is in state \(|1\rangle\).</li>
+                        <li><strong>Logic:</strong>
+                            \[|00\rangle \to |00\rangle, \quad |01\rangle \to |01\rangle\]
+                            \[|10\rangle \to |11\rangle, \quad |11\rangle \to |10\rangle\]
+                        </li>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[CNOT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{bmatrix}\]
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- SWAP Gate -->
+                <div class="gate-section">
+                    <h4>2. SWAP Gate</h4>
+                    <ul>
+                        <li><strong>Description:</strong> The SWAP gate exchanges the states of two qubits.</li>
+                        <li><strong>Logic:</strong> \(|a, b\rangle \to |b, a\rangle\)</li>
+                        <li><strong>Decomposition:</strong> A SWAP gate can be implemented using three CNOT gates:
+                            \[SWAP = CNOT_{1 \to 2} \times CNOT_{2 \to 1} \times CNOT_{1 \to 2}\]
+                        </li>
+                        <li><strong>Matrix:</strong>
+                            <div class="matrix-display">
+                                \[SWAP = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}\]
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Toffoli Gate -->
+                <div class="gate-section">
+                    <h4>3. Toffoli Gate (CCNOT)</h4>
+                    <ul>
+                        <li><strong>Description:</strong> A three-qubit gate with two control qubits and one target. It is a "Controlled-Controlled-NOT" gate.</li>
+                        <li><strong>Logic:</strong> The target flips if and only if <strong>both</strong> control qubits are \(|1\rangle\).
+                            \[|a, b, c\rangle \to |a, b, c \oplus (a \cdot b)\rangle\]
+                        </li>
+                        <li><strong>Significance:</strong> It is a reversible version of the classical AND gate, making it universal for classical reversible computation.</li>
+                    </ul>
+                </div>
+
+                <!-- Creating Entanglement -->
+                <h3>Creating Entanglement</h3>
+                <p>The most famous application of the CNOT gate is creating <strong>Entanglement</strong> (Bell States). A CNOT gate does not create entanglement on its own if the input is a standard basis state. However, if the control qubit is in a <strong>superposition</strong>, entanglement is generated.</p>
+
+                <div class="highlight-box">
+                    <strong>Steps to Create a Bell State (\(|\Phi^+\rangle\)):</strong>
+                    <ul class="step-list">
+                        <li><strong>Start:</strong> Initialize two qubits in \(|00\rangle\).</li>
+                        <li><strong>Hadamard:</strong> Apply an H-gate to the first qubit (Control).
+                            \[|00\rangle \xrightarrow{H \otimes I} \frac{|0\rangle + |1\rangle}{\sqrt{2}} \otimes |0\rangle = \frac{|00\rangle + |10\rangle}{\sqrt{2}}\]
+                        </li>
+                        <li><strong>CNOT:</strong> Apply CNOT with qubit 1 as control and qubit 2 as target.
+                            <br>• \(|00\rangle \to |00\rangle\) (Control is 0, Target stays 0)
+                            <br>• \(|10\rangle \to |11\rangle\) (Control is 1, Target flips to 1)
+                            <br><strong>Result:</strong> \(|\Phi^+\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}\)
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    This state cannot be factored into \(|\psi_1\rangle \otimes |\psi_2\rangle\), proving the qubits are <strong>entangled</strong>.
+                </div>
+
+                <!-- Controlled Operations -->
+                <h3>Controlled Operations (Controlled-U)</h3>
+                <p>Multi-qubit gates generalize to Controlled-Unitary (\(CU\)) operations.</p>
+                <ul>
+                    <li><strong>Structure:</strong>
+                        \[CU = \begin{bmatrix} I & 0 \\ 0 & U \end{bmatrix}\]
+                        If the control bit is 0, the Identity (\(I\)) is applied to the target. If the control bit is 1, the Unitary \(U\) is applied.
+                    </li>
+                    <li><strong>Example:</strong> Controlled-Z (CZ) applies a Z-gate (phase flip) only if the control is 1.</li>
+                </ul>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Bell State Circuit (Entanglement)</div>
+                    <svg width="550" height="200" viewBox="0 0 550 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#06b6d4"/>
+                                <stop offset="100%" style="stop-color:#0891b2"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Qubit lines -->
+                        <line x1="50" y1="60" x2="420" y2="60" stroke="#64748b" stroke-width="2"/>
+                        <text x="25" y="65" font-family="Inter" font-size="14" fill="#94a3b8">|0⟩</text>
+                        
+                        <line x1="50" y1="130" x2="420" y2="130" stroke="#64748b" stroke-width="2"/>
+                        <text x="25" y="135" font-family="Inter" font-size="14" fill="#94a3b8">|0⟩</text>
+
+                        <!-- Hadamard Gate -->
+                        <rect x="90" y="40" width="45" height="45" rx="6" fill="url(#gateGrad)" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="112" y="68" font-family="Inter" font-size="18" font-weight="600" fill="white" text-anchor="middle">H</text>
+                        <text x="112" y="28" font-family="Inter" font-size="10" fill="#a5b4fc" text-anchor="middle">Superposition</text>
+
+                        <!-- State after H -->
+                        <text x="160" y="55" font-family="Inter" font-size="10" fill="#64748b">1/√2(|0⟩+|1⟩)</text>
+
+                        <!-- CNOT Gate -->
+                        <line x1="250" y1="60" x2="250" y2="130" stroke="#a5b4fc" stroke-width="2"/>
+                        <circle cx="250" cy="60" r="8" fill="#6366f1"/>
+                        <circle cx="250" cy="130" r="16" fill="none" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="234" y1="130" x2="266" y2="130" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="250" y1="114" x2="250" y2="146" stroke="#6366f1" stroke-width="2"/>
+                        <text x="250" y="28" font-family="Inter" font-size="10" fill="#10b981" text-anchor="middle">Entanglement</text>
+
+                        <!-- Output state -->
+                        <text x="320" y="95" font-family="Inter" font-size="14" fill="#10b981" font-weight="500">|Φ⁺⟩ = 1/√2(|00⟩ + |11⟩)</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 3 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q3</span>
+                <h2 class="question-title">Discuss reversibility in quantum gates. Explain why unitary operators guarantee reversible computation.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+
+                <h3>1. Reversibility in Quantum Gates</h3>
+                <ul>
+                    <li><strong>Definition:</strong> A computational process is <strong>reversible</strong> if the input state can be uniquely recovered from the output state. There is a one-to-one mapping between inputs and outputs.</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Classical vs. Quantum:</strong>
+                    <ul>
+                        <li><strong>Classical Irreversibility:</strong> Most classical logic gates are <strong>irreversible</strong>. For example, in an AND gate, if the output is 0, the input could have been (0,0), (0,1), or (1,0). Information is lost, which leads to heat dissipation (Landauer's Principle).</li>
+                        <li><strong>Quantum Reversibility:</strong> Quantum mechanics requires that the evolution of a closed system preserves information. Therefore, all quantum logic gates must be <strong>reversible</strong>.</li>
+                    </ul>
+                </div>
+
+                <h3>2. Unitary Operators Guarantee Reversibility</h3>
+                <p>The mathematical guarantee for reversibility comes from the fact that all quantum gates are represented by <strong>Unitary Matrices</strong> (\(U\)).</p>
+
+                <ul>
+                    <li><strong>Unitary Condition:</strong> A matrix \(U\) is unitary if its conjugate transpose (\(U^\dagger\)) is its inverse:
+                        \[U^\dagger U = I \implies U^{-1} = U^\dagger\]
+                    </li>
+                </ul>
+
+                <div class="success-box">
+                    <strong>Why this guarantees reversibility:</strong>
+                    <ol>
+                        <li><strong>Existence of Inverse:</strong> Since \(U^{-1}\) always exists, every quantum operation can be "undone". If we apply gate \(U\) to get \(|\psi'\rangle\), we can recover \(|\psi\rangle\) by applying \(U^\dagger\):
+                            \[U^\dagger |\psi'\rangle = U^\dagger (U |\psi\rangle) = I |\psi\rangle = |\psi\rangle\]
+                        </li>
+                        <li><strong>Preservation of Information:</strong> Unitary operators preserve the inner product and norm of state vectors. Probabilities are conserved, and distinct states remain distinct.</li>
+                    </ol>
+                </div>
+
+                <h3>3. Examples</h3>
+                <ul>
+                    <li><strong>Pauli-X Gate:</strong> The inverse of the Pauli-X gate is itself (\(X = X^\dagger\)).
+                        \[X \cdot X = I\]
+                        Applying the bit-flip twice returns the qubit to its original state.
+                    </li>
+                    <li><strong>Toffoli Gate:</strong> The classical AND gate is irreversible. Quantum computing uses the <strong>Toffoli Gate</strong> (CCNOT) as a reversible alternative.</li>
+                </ul>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Irreversible vs Reversible Logic</div>
+                    <svg width="600" height="260" viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Classical Side -->
+                        <text x="130" y="35" font-family="Inter" font-size="14" font-weight="600" fill="#ef4444" text-anchor="middle">Classical (Irreversible)</text>
+                        
+                        <line x1="40" y1="80" x2="85" y2="80" stroke="#64748b" stroke-width="2"/>
+                        <line x1="40" y1="120" x2="85" y2="120" stroke="#64748b" stroke-width="2"/>
+                        <text x="30" y="85" font-family="Inter" font-size="12" fill="#94a3b8">A</text>
+                        <text x="30" y="125" font-family="Inter" font-size="12" fill="#94a3b8">B</text>
+
+                        <path d="M 85 65 L 125 65 Q 165 100 125 135 L 85 135 Z" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                        <text x="110" y="105" font-family="Inter" font-size="12" fill="#ef4444" font-weight="500">AND</text>
+                        
+                        <line x1="165" y1="100" x2="220" y2="100" stroke="#64748b" stroke-width="2"/>
+                        <text x="230" y="105" font-family="Inter" font-size="12" fill="#94a3b8">Y</text>
+                        
+                        <text x="130" y="180" font-family="Inter" font-size="11" fill="#ef4444" text-anchor="middle">❌ Input Lost!</text>
+                        <text x="130" y="195" font-family="Inter" font-size="10" fill="#64748b" text-anchor="middle">(Can't go back)</text>
+
+                        <!-- Divider -->
+                        <line x1="280" y1="30" x2="280" y2="220" stroke="#334155" stroke-dasharray="6,4" stroke-width="2"/>
+
+                        <!-- Quantum Side -->
+                        <text x="440" y="35" font-family="Inter" font-size="14" font-weight="600" fill="#10b981" text-anchor="middle">Quantum (Reversible)</text>
+                        
+                        <line x1="320" y1="80" x2="560" y2="80" stroke="#64748b" stroke-width="2"/>
+                        <line x1="320" y1="120" x2="560" y2="120" stroke="#64748b" stroke-width="2"/>
+                        
+                        <text x="305" y="85" font-family="Inter" font-size="12" fill="#94a3b8">|ψ⟩</text>
+
+                        <rect x="370" y="60" width="55" height="80" rx="8" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="397" y="107" font-family="Inter" font-size="20" font-weight="700" fill="#06b6d4" text-anchor="middle">U</text>
+
+                        <rect x="450" y="60" width="55" height="80" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="477" y="107" font-family="Inter" font-size="18" font-weight="700" fill="#f59e0b" text-anchor="middle">U†</text>
+
+                        <text x="575" y="100" font-family="Inter" font-size="12" fill="#10b981">= |ψ⟩</text>
+                        
+                        <text x="440" y="180" font-family="Inter" font-size="11" fill="#10b981" text-anchor="middle">✓ Information Preserved!</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 4 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q4</span>
+                <h2 class="question-title">Explain the no-cloning theorem with proof. What are its implications in quantum information processing?</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+
+                <h3>1. The No-Cloning Theorem</h3>
+                <p>The <strong>No-Cloning Theorem</strong> states that it is impossible to create an identical copy of an arbitrary unknown quantum state. Unlike classical bits, which can be easily copied, quantum states cannot be duplicated.</p>
+
+                <div class="warning-box">
+                    <strong>Statement:</strong> There exists no unitary operator \(U\) (a "cloning machine") that can transform the state \(|\psi\rangle \otimes |s\rangle\) into \(|\psi\rangle \otimes |\psi\rangle\) for all arbitrary states \(|\psi\rangle\), where \(|s\rangle\) is a blank ancillary state.
+                </div>
+
+                <h3>2. Mathematical Proof</h3>
+                <p>We prove this by contradiction using the <strong>linearity</strong> of quantum mechanics.</p>
+
+                <div class="gate-section">
+                    <h4>Step 1: Assumption</h4>
+                    <p>Assume there exists a unitary operator \(U\) that can copy any state \(|\psi\rangle\) into a blank state \(|0\rangle\).
+                    \[U(|\psi\rangle \otimes |0\rangle) = |\psi\rangle \otimes |\psi\rangle\]</p>
+                </div>
+
+                <div class="gate-section">
+                    <h4>Step 2: Copying Basis States</h4>
+                    <p>This machine must work for the basis states \(|0\rangle\) and \(|1\rangle\):</p>
+                    <ol>
+                        <li>\(U(|0\rangle \otimes |0\rangle) = |0\rangle \otimes |0\rangle = |00\rangle\)</li>
+                        <li>\(U(|1\rangle \otimes |0\rangle) = |1\rangle \otimes |1\rangle = |11\rangle\)</li>
+                    </ol>
+                </div>
+
+                <div class="gate-section">
+                    <h4>Step 3: Copying a Superposition</h4>
+                    <p>Now consider a general superposition state \(|\psi\rangle = \alpha|0\rangle + \beta|1\rangle\).</p>
+                    <p><strong>Expected Output:</strong></p>
+                    \[|\psi\rangle \otimes |\psi\rangle = \alpha^2|00\rangle + \alpha\beta|01\rangle + \beta\alpha|10\rangle + \beta^2|11\rangle\]
+                </div>
+
+                <div class="gate-section">
+                    <h4>Step 4: Applying Linearity</h4>
+                    <p>However, quantum evolution is linear. Using results from Step 2:</p>
+                    \[U(|\psi\rangle \otimes |0\rangle) = \alpha U(|00\rangle) + \beta U(|10\rangle)\]
+                    <p><strong>Actual Output:</strong> \(\alpha|00\rangle + \beta|11\rangle\)</p>
+                </div>
+
+                <div class="warning-box">
+                    <h4>Step 5: Contradiction</h4>
+                    <p>Comparing Expected vs Actual:</p>
+                    \[\alpha^2|00\rangle + \alpha\beta|01\rangle + \beta\alpha|10\rangle + \beta^2|11\rangle \neq \alpha|00\rangle + \beta|11\rangle\]
+                    <p>The cross terms (\(|01\rangle\) and \(|10\rangle\)) are missing! Therefore, a general unknown quantum state <strong>cannot be cloned</strong>.</p>
+                </div>
+
+                <h3>3. Implications in Quantum Information Processing</h3>
+                <div class="implications-grid">
+                    <div class="implication-card">
+                        <h5>🔐 Quantum Cryptography</h5>
+                        <p>Guarantees security of QKD protocols like BB84. Eavesdroppers cannot copy quantum keys without detection.</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>💾 No Quantum Backup</h5>
+                        <p>You cannot simply "backup" a quantum hard drive by copying its contents to another drive.</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>🔧 Error Correction</h5>
+                        <p>QEC requires fundamentally different techniques (entanglement, syndrome measurement) rather than simple replication.</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>⚡ Computing Limits</h5>
+                        <p>Quantum circuits cannot use "fan-out" gates to send the same qubit signal to multiple wires.</p>
+                    </div>
+                </div>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">The Impossible Cloning Machine</div>
+                    <svg width="550" height="240" viewBox="0 0 550 240" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cloning Box -->
+                        <rect x="175" y="45" width="160" height="130" rx="12" fill="#1e293b" stroke="#ef4444" stroke-width="3"/>
+                        <text x="255" y="115" font-family="Inter" font-size="16" font-weight="700" fill="#ef4444" text-anchor="middle">CLONE (U)</text>
+
+                        <!-- Input Lines -->
+                        <line x1="80" y1="80" x2="175" y2="80" stroke="#64748b" stroke-width="2"/>
+                        <text x="55" y="85" font-family="Inter" font-size="14" fill="#06b6d4">|ψ⟩</text>
+                        <text x="100" y="65" font-family="Inter" font-size="10" fill="#94a3b8">Unknown State</text>
+
+                        <line x1="80" y1="140" x2="175" y2="140" stroke="#64748b" stroke-width="2"/>
+                        <text x="55" y="145" font-family="Inter" font-size="14" fill="#94a3b8">|0⟩</text>
+                        <text x="100" y="160" font-family="Inter" font-size="10" fill="#64748b">Blank State</text>
+
+                        <!-- Output Lines -->
+                        <line x1="335" y1="80" x2="420" y2="80" stroke="#64748b" stroke-width="2"/>
+                        <text x="435" y="85" font-family="Inter" font-size="14" fill="#f59e0b">|ψ⟩ ?</text>
+
+                        <line x1="335" y1="140" x2="420" y2="140" stroke="#64748b" stroke-width="2"/>
+                        <text x="435" y="145" font-family="Inter" font-size="14" fill="#f59e0b">|ψ⟩ ?</text>
+
+                        <!-- Forbidden Symbol -->
+                        <circle cx="255" cy="110" r="70" stroke="#ef4444" stroke-width="5" fill="none" opacity="0.7"/>
+                        <line x1="200" y1="160" x2="310" y2="60" stroke="#ef4444" stroke-width="5" opacity="0.7"/>
+                        
+                        <!-- Label -->
+                        <text x="255" y="210" font-family="Inter" font-size="12" font-weight="600" fill="#ef4444" text-anchor="middle">FORBIDDEN BY LINEARITY</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 5 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q5</span>
+                <h2 class="question-title">Construct and analyze a quantum circuit to implement a controlled-phase operation using fundamental gates.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+
+                <h3>1. Introduction: Controlled-Phase Operation</h3>
+                <p>The Controlled-Phase operation (typically the <strong>Controlled-Z</strong> or \(CZ\) gate) is a two-qubit gate that leaves the basis states \(|00\rangle, |01\rangle, |10\rangle\) unchanged but adds a phase factor of \(-1\) to the state \(|11\rangle\).</p>
+
+                <ul>
+                    <li><strong>Target Logic:</strong> If the control qubit is \(|1\rangle\), apply a \(Z\) gate (phase-flip) to the target qubit.</li>
+                    <li><strong>Matrix Representation:</strong>
+                        <div class="matrix-display">
+                            \[CZ = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & -1 \end{bmatrix}\]
+                        </div>
+                    </li>
+                </ul>
+
+                <h3>2. Circuit Construction</h3>
+                <p>We can construct this gate using the fundamental <strong>CNOT</strong> gate and <strong>Hadamard (H)</strong> gates.</p>
+
+                <div class="highlight-box">
+                    <strong>Key Identity:</strong> The Pauli-Z gate can be generated from the Pauli-X gate using Hadamard gates:
+                    \[Z = H X H\]
+                    <p>Since \(H^2 = I\) and \(HZH = X\), transforming the basis from Z to X allows us to use a bit-flip (X) to perform a phase-flip (Z).</p>
+                </div>
+
+                <p><strong>Construction:</strong> To create a Controlled-Z, we sandwich the target of a CNOT between two Hadamard gates.</p>
+                \[\text{Circuit} = (I \otimes H) \cdot CNOT \cdot (I \otimes H)\]
+
+                <h3>3. Step-by-Step Analysis</h3>
+
+                <div class="gate-section">
+                    <h4>Case c=0 (Control is 0)</h4>
+                    <p>The CNOT acts as Identity. After applying H, CNOT, H on target:</p>
+                    \[|\psi_{final}\rangle = |0\rangle \otimes (H \cdot H)|t\rangle = |0\rangle|t\rangle\]
+                    <p><strong>No change.</strong></p>
+                </div>
+
+                <div class="gate-section">
+                    <h4>Case c=1 (Control is 1)</h4>
+                    <p>The CNOT applies X to the target:</p>
+                    \[|\psi_{final}\rangle = |1\rangle \otimes (H \cdot X \cdot H)|t\rangle\]
+                    <p>Using the identity \(H X H = Z\):</p>
+                    \[|\psi_{final}\rangle = |1\rangle \otimes Z|t\rangle\]
+                    <p><strong>Z gate applied.</strong></p>
+                </div>
+
+                <div class="success-box">
+                    <strong>Conclusion:</strong> The circuit performs the operation \(|c\rangle|t\rangle \to |c\rangle Z^c|t\rangle\), which is exactly the Controlled-Phase (\(CZ\)) operation.
+                </div>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Controlled-Phase Circuit Implementation</div>
+                    <svg width="580" height="180" viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="hGateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#06b6d4"/>
+                                <stop offset="100%" style="stop-color:#0891b2"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Qubit lines -->
+                        <line x1="50" y1="60" x2="450" y2="60" stroke="#64748b" stroke-width="2"/>
+                        <text x="30" y="65" font-family="Inter" font-size="14" fill="#94a3b8">|c⟩</text>
+
+                        <line x1="50" y1="120" x2="450" y2="120" stroke="#64748b" stroke-width="2"/>
+                        <text x="30" y="125" font-family="Inter" font-size="14" fill="#94a3b8">|t⟩</text>
+
+                        <!-- First H gate -->
+                        <rect x="90" y="100" width="40" height="40" rx="6" fill="url(#hGateGrad)" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="110" y="125" font-family="Inter" font-size="16" font-weight="600" fill="white" text-anchor="middle">H</text>
+
+                        <!-- CNOT -->
+                        <line x1="200" y1="60" x2="200" y2="120" stroke="#a5b4fc" stroke-width="2"/>
+                        <circle cx="200" cy="60" r="6" fill="#6366f1"/>
+                        <circle cx="200" cy="120" r="14" fill="none" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="186" y1="120" x2="214" y2="120" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="200" y1="106" x2="200" y2="134" stroke="#6366f1" stroke-width="2"/>
+
+                        <!-- Second H gate -->
+                        <rect x="280" y="100" width="40" height="40" rx="6" fill="url(#hGateGrad)" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="300" y="125" font-family="Inter" font-size="16" font-weight="600" fill="white" text-anchor="middle">H</text>
+
+                        <!-- Equals sign -->
+                        <text x="390" y="95" font-family="Inter" font-size="28" font-weight="700" fill="#64748b">=</text>
+
+                        <!-- CZ gate representation -->
+                        <line x1="450" y1="60" x2="500" y2="60" stroke="#64748b" stroke-width="2"/>
+                        <line x1="450" y1="120" x2="500" y2="120" stroke="#64748b" stroke-width="2"/>
+                        <line x1="475" y1="60" x2="475" y2="120" stroke="#10b981" stroke-width="2"/>
+                        <circle cx="475" cy="60" r="6" fill="#10b981"/>
+                        <circle cx="475" cy="120" r="6" fill="#10b981"/>
+                        <text x="510" y="95" font-family="Inter" font-size="14" font-weight="600" fill="#10b981">CZ</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 6 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q6</span>
+                <h2 class="question-title">Discuss the design and execution of basic quantum circuits using Qiskit or Cirq, with examples of simulation results.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+
+                <h3>1. Introduction to Quantum SDKs</h3>
+                <p>To run quantum algorithms on real hardware or simulators, we use software development kits (SDKs) like <strong>Qiskit</strong> (by IBM) or <strong>Cirq</strong> (by Google). These frameworks allow us to design circuits programmatically using Python.</p>
+
+                <h3>2. Steps to Design and Execute a Circuit</h3>
+                <div class="implications-grid">
+                    <div class="implication-card">
+                        <h5>🏗️ Step 1: Build</h5>
+                        <p>Initialize a QuantumCircuit with qubits and classical bits. Apply gates (H, X, CNOT).</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>⚙️ Step 2: Transpile</h5>
+                        <p>Convert code into basic gates that the backend can execute.</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>🚀 Step 3: Run</h5>
+                        <p>Send circuit to a backend (simulator or real quantum computer). Repeat multiple shots.</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>📊 Step 4: Analyze</h5>
+                        <p>Obtain measurement counts and visualize using histograms.</p>
+                    </div>
+                </div>
+
+                <h3>3. Example: Bell State Circuit in Qiskit</h3>
+                <p>Let's design a circuit to create the Bell State \(|\Phi^+\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}\).</p>
+
+                <div class="code-block">
+                    <span class="keyword">from</span> qiskit <span class="keyword">import</span> QuantumCircuit, Aer, execute
+                    <br><br>
+                    <span class="comment"># 1. Initialize Circuit: 2 Qubits, 2 Classical Bits</span><br>
+                    qc = QuantumCircuit(<span class="number">2</span>, <span class="number">2</span>)
+                    <br><br>
+                    <span class="comment"># 2. Apply Gates</span><br>
+                    qc.<span class="function">h</span>(<span class="number">0</span>)          <span class="comment"># Apply Hadamard to Qubit 0 -> Superposition</span>
+                    <br>
+                    qc.<span class="function">cx</span>(<span class="number">0</span>, <span class="number">1</span>)      <span class="comment"># Apply CNOT (Control: 0, Target: 1) -> Entanglement</span>
+                    <br><br>
+                    <span class="comment"># 3. Measure</span><br>
+                    qc.<span class="function">measure</span>([<span class="number">0</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">1</span>])  <span class="comment"># Map Qubits to Classical Bits</span>
+                    <br><br>
+                    <span class="comment"># 4. Select Simulator</span><br>
+                    simulator = Aer.<span class="function">get_backend</span>(<span class="string">'qasm_simulator'</span>)
+                    <br><br>
+                    <span class="comment"># 5. Execute 1024 shots</span><br>
+                    job = <span class="function">execute</span>(qc, simulator, shots=<span class="number">1024</span>)<br>
+                    result = job.<span class="function">result</span>()
+                    <br><br>
+                    <span class="comment"># 6. Get Counts</span><br>
+                    counts = result.<span class="function">get_counts</span>(qc)<br>
+                    <span class="function">print</span>(counts)  <span class="comment"># {'00': ~512, '11': ~512}</span><br>
+                </div>
+
+                <h3>4. Simulation Results</h3>
+                <p>Since the state is \(\frac{|00\rangle + |11\rangle}{\sqrt{2}}\), the theoretical probability of measuring '00' is 50% and '11' is 50%.</p>
+                
+                <ul>
+                    <li><strong>Expected Output:</strong> <code>{'00': ~512, '11': ~512}</code> (ideal distribution)</li>
+                    <li><strong>Real Output (Example):</strong> <code>{'00': 503, '11': 521}</code></li>
+                </ul>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Circuit Visualization and Result Histogram</div>
+                    <svg width="580" height="280" viewBox="0 0 580 280" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Circuit Section -->
+                        <text x="30" y="25" font-family="Inter" font-size="12" font-weight="600" fill="#a5b4fc">1. Circuit Diagram (Bell State)</text>
+                        
+                        <text x="25" y="60" font-family="Inter" font-size="12" fill="#94a3b8">q₀</text>
+                        <line x1="45" y1="55" x2="250" y2="55" stroke="#64748b" stroke-width="2"/>
+                        
+                        <text x="25" y="100" font-family="Inter" font-size="12" fill="#94a3b8">q₁</text>
+                        <line x1="45" y1="95" x2="250" y2="95" stroke="#64748b" stroke-width="2"/>
+
+                        <!-- H gate -->
+                        <rect x="70" y="35" width="35" height="35" rx="5" fill="#0891b2" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="87" y="58" font-family="Inter" font-size="14" font-weight="600" fill="white" text-anchor="middle">H</text>
+
+                        <!-- CNOT -->
+                        <line x1="140" y1="55" x2="140" y2="95" stroke="#a5b4fc" stroke-width="2"/>
+                        <circle cx="140" cy="55" r="5" fill="#6366f1"/>
+                        <circle cx="140" cy="95" r="10" fill="none" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="130" y1="95" x2="150" y2="95" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="140" y1="85" x2="140" y2="105" stroke="#6366f1" stroke-width="2"/>
+
+                        <!-- Measure -->
+                        <rect x="190" y="38" width="30" height="32" rx="3" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="205" y="58" font-family="Inter" font-size="10" fill="#f59e0b" text-anchor="middle">M</text>
+                        <rect x="190" y="78" width="30" height="32" rx="3" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="205" y="98" font-family="Inter" font-size="10" fill="#f59e0b" text-anchor="middle">M</text>
+
+                        <!-- Histogram Section -->
+                        <text x="320" y="25" font-family="Inter" font-size="12" font-weight="600" fill="#a5b4fc">2. Simulation Result (Counts)</text>
+                        
+                        <!-- Axes -->
+                        <line x1="340" y1="210" x2="540" y2="210" stroke="#475569" stroke-width="2"/>
+                        <line x1="340" y1="210" x2="340" y2="50" stroke="#475569" stroke-width="2"/>
+
+                        <!-- Bar 00 -->
+                        <rect x="365" y="80" width="50" height="130" rx="4" fill="#3b82f6"/>
+                        <text x="390" y="70" font-family="Inter" font-size="11" fill="#10b981" text-anchor="middle">50%</text>
+                        <text x="390" y="235" font-family="Inter" font-size="12" fill="#94a3b8" text-anchor="middle">00</text>
+
+                        <!-- Bar 11 -->
+                        <rect x="475" y="80" width="50" height="130" rx="4" fill="#3b82f6"/>
+                        <text x="500" y="70" font-family="Inter" font-size="11" fill="#10b981" text-anchor="middle">50%</text>
+                        <text x="500" y="235" font-family="Inter" font-size="12" fill="#94a3b8" text-anchor="middle">11</text>
+
+                        <!-- 01/10 labels -->
+                        <text x="432" y="235" font-family="Inter" font-size="10" fill="#64748b" text-anchor="middle">01/10</text>
+                        <text x="432" y="200" font-family="Inter" font-size="9" fill="#64748b" text-anchor="middle">~0%</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 7 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q7</span>
+                <h2 class="question-title">Explain the decomposition of multi-qubit gates into elementary single and two-qubit gates.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+
+                <h3>1. Principle of Universality</h3>
+                <p>In quantum computing, any arbitrary multi-qubit unitary operation can be decomposed into a sequence of <strong>single-qubit gates</strong> and <strong>CNOT gates</strong>. This set (Single Qubit Gates + CNOT) is known as a <strong>Universal Gate Set</strong>.</p>
+
+                <div class="highlight-box">
+                    <strong>Goal:</strong> Physical hardware often only supports simple interactions (like 1-qubit rotations and neighbor-neighbor CNOTs). To run complex algorithms, we must break them down into these elementary blocks.
+                </div>
+
+                <h3>2. Decomposition of Controlled-Unitary (CU) Gates</h3>
+                <p>A common multi-qubit gate is the Controlled-\(U\) gate, where an arbitrary single-qubit unitary \(U\) is applied to a target qubit if the control is \(|1\rangle\).</p>
+
+                <div class="gate-section">
+                    <h4>The A-B-C Decomposition</h4>
+                    <p>Any unitary matrix \(U\) can be written as:</p>
+                    \[U = e^{i\alpha} A X B X C\]
+                    <p>Where \(A, B, C\) are unitary operators satisfying:</p>
+                    <ol>
+                        <li>\(ABC = I\) (Identity)</li>
+                        <li>\(X\) is the Pauli-X (NOT) gate</li>
+                    </ol>
+                </div>
+
+                <h3>3. Decomposition of the Toffoli Gate (CCNOT)</h3>
+                <p>The Toffoli gate is a 3-qubit gate (Controlled-Controlled-NOT). It is decomposed into <strong>six CNOT gates</strong> and several single-qubit \(T\) and Hadamard gates.</p>
+
+                <h3>4. General Multi-Qubit Control</h3>
+                <p>For a gate with \(n\) controls (\(C^n(U)\)), the decomposition requires \(O(n^2)\) elementary gates. Toffoli gates are often used as intermediate building blocks.</p>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Decomposition of Controlled-U (ABC Lemma)</div>
+                    <svg width="580" height="180" viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Qubit lines -->
+                        <line x1="40" y1="55" x2="490" y2="55" stroke="#64748b" stroke-width="2"/>
+                        <text x="20" y="60" font-family="Inter" font-size="14" fill="#94a3b8">|c⟩</text>
+
+                        <line x1="40" y1="120" x2="490" y2="120" stroke="#64748b" stroke-width="2"/>
+                        <text x="20" y="125" font-family="Inter" font-size="14" fill="#94a3b8">|t⟩</text>
+
+                        <!-- C gate -->
+                        <rect x="70" y="100" width="35" height="40" rx="5" fill="#0891b2" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="87" y="125" font-family="Inter" font-size="14" font-weight="600" fill="white" text-anchor="middle">C</text>
+
+                        <!-- CNOT 1 -->
+                        <line x1="140" y1="55" x2="140" y2="120" stroke="#a5b4fc" stroke-width="2"/>
+                        <circle cx="140" cy="55" r="5" fill="#6366f1"/>
+                        <circle cx="140" cy="120" r="10" fill="none" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="130" y1="120" x2="150" y2="120" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="140" y1="110" x2="140" y2="130" stroke="#6366f1" stroke-width="2"/>
+
+                        <!-- B gate -->
+                        <rect x="175" y="100" width="35" height="40" rx="5" fill="#0891b2" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="192" y="125" font-family="Inter" font-size="14" font-weight="600" fill="white" text-anchor="middle">B</text>
+
+                        <!-- CNOT 2 -->
+                        <line x1="245" y1="55" x2="245" y2="120" stroke="#a5b4fc" stroke-width="2"/>
+                        <circle cx="245" cy="55" r="5" fill="#6366f1"/>
+                        <circle cx="245" cy="120" r="10" fill="none" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="235" y1="120" x2="255" y2="120" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="245" y1="110" x2="245" y2="130" stroke="#6366f1" stroke-width="2"/>
+
+                        <!-- A gate -->
+                        <rect x="280" y="100" width="35" height="40" rx="5" fill="#0891b2" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="297" y="125" font-family="Inter" font-size="14" font-weight="600" fill="white" text-anchor="middle">A</text>
+
+                        <!-- Phase gate -->
+                        <rect x="350" y="35" width="40" height="40" rx="5" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+                        <text x="370" y="60" font-family="Inter" font-size="11" font-weight="600" fill="white" text-anchor="middle">P(α)</text>
+
+                        <!-- Equals -->
+                        <text x="420" y="90" font-family="Inter" font-size="24" font-weight="700" fill="#64748b">=</text>
+
+                        <!-- Result CU -->
+                        <rect x="460" y="100" width="35" height="40" rx="5" fill="#10b981" stroke="#059669" stroke-width="2"/>
+                        <text x="477" y="125" font-family="Inter" font-size="14" font-weight="600" fill="white" text-anchor="middle">U</text>
+                        <line x1="477" y1="55" x2="477" y2="100" stroke="#10b981" stroke-width="2"/>
+                        <circle cx="477" cy="55" r="5" fill="#10b981"/>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 8 -->
+        <article class="question-card">
+            <div class="question-header">
+                <span class="question-number">Q8</span>
+                <h2 class="question-title">Illustrate how quantum gates can be represented on the Bloch sphere and explain their rotation effects.</h2>
+            </div>
+
+            <div class="answer-section">
+                <div class="answer-label">📝 Answer</div>
+
+                <h3>1. Bloch Sphere Representation</h3>
+                <p>The Bloch sphere is a geometric representation of the state space of a single qubit. Any pure quantum state \(|\psi\rangle\) can be written as:</p>
+                \[|\psi\rangle = \cos\left(\frac{\theta}{2}\right)|0\rangle + e^{i\phi}\sin\left(\frac{\theta}{2}\right)|1\rangle\]
+                <p>This corresponds to a vector \(\vec{r}\) on the unit sphere defined by angles \(\theta\) (latitude) and \(\phi\) (longitude).</p>
+
+                <ul>
+                    <li><strong>North Pole:</strong> \(|0\rangle\) (\(\theta=0\))</li>
+                    <li><strong>South Pole:</strong> \(|1\rangle\) (\(\theta=\pi\))</li>
+                    <li><strong>Equator:</strong> Superposition states like \(|+\rangle\) and \(|-\rangle\)</li>
+                </ul>
+
+                <h3>2. Gates as Rotations</h3>
+                <p>Any single-qubit unitary gate corresponds to a rotation of the Bloch vector about a specific axis \(\hat{n}\) by an angle \(\gamma\). The general operator is:</p>
+                \[U = e^{-i\frac{\gamma}{2}(\vec{\sigma} \cdot \hat{n})} = \cos\left(\frac{\gamma}{2}\right)I - i\sin\left(\frac{\gamma}{2}\right)(\vec{\sigma} \cdot \hat{n})\]
+
+                <h3>3. Rotation Effects of Specific Gates</h3>
+
+                <div class="implications-grid">
+                    <div class="implication-card">
+                        <h5>Pauli-X Gate (\(R_x(\pi)\))</h5>
+                        <p><strong>Rotation:</strong> 180° around X-axis<br><strong>Effect:</strong> Flips \(|0\rangle \leftrightarrow |1\rangle\) (bit flip)</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>Pauli-Y Gate (\(R_y(\pi)\))</h5>
+                        <p><strong>Rotation:</strong> 180° around Y-axis<br><strong>Effect:</strong> Maps \(|0\rangle \to i|1\rangle\)</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>Pauli-Z Gate (\(R_z(\pi)\))</h5>
+                        <p><strong>Rotation:</strong> 180° around Z-axis<br><strong>Effect:</strong> Phase flip, \(|+\rangle \to |-\rangle\)</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>Hadamard Gate (H)</h5>
+                        <p><strong>Rotation:</strong> 180° around \(\frac{\hat{x}+\hat{z}}{\sqrt{2}}\)<br><strong>Effect:</strong> Swaps Z and X bases</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>S Gate</h5>
+                        <p><strong>Rotation:</strong> 90° around Z-axis<br><strong>Effect:</strong> Quarter turn phase shift</p>
+                    </div>
+                    <div class="implication-card">
+                        <h5>T Gate</h5>
+                        <p><strong>Rotation:</strong> 45° around Z-axis<br><strong>Effect:</strong> Eighth turn phase shift</p>
+                    </div>
+                </div>
+
+                <!-- Diagram -->
+                <div class="diagram-container">
+                    <div class="diagram-title">Bloch Sphere Rotations</div>
+                    <svg width="580" height="300" viewBox="0 0 580 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="blochGrad" cx="30%" cy="30%" r="70%">
+                                <stop offset="0%" style="stop-color:#475569;stop-opacity:0.4"/>
+                                <stop offset="100%" style="stop-color:#1e293b;stop-opacity:0.1"/>
+                            </radialGradient>
+                            <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#ef4444"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Z-Rotation Sphere -->
+                        <g transform="translate(120, 150)">
+                            <circle cx="0" cy="0" r="85" stroke="#475569" fill="url(#blochGrad)" stroke-width="2"/>
+                            <ellipse cx="0" cy="0" rx="85" ry="28" stroke="#64748b" fill="none" stroke-dasharray="4,4"/>
+                            <line x1="0" y1="-85" x2="0" y2="85" stroke="#64748b" stroke-width="1.5"/>
+                            <text x="-15" y="-95" font-family="Inter" font-size="12" fill="#94a3b8">|0⟩</text>
+                            
+                            <!-- +x state -->
+                            <line x1="0" y1="0" x2="70" y2="0" stroke="#06b6d4" stroke-width="2.5"/>
+                            <circle cx="70" cy="0" r="5" fill="#06b6d4"/>
+                            <text x="80" y="5" font-family="Inter" font-size="11" fill="#06b6d4">|+⟩</text>
+                            
+                            <!-- Rotation arc -->
+                            <path d="M 65 0 A 65 22 0 0 1 -65 0" stroke="#ef4444" stroke-width="2.5" fill="none" marker-end="url(#arrowRed)"/>
+                            <circle cx="-70" cy="0" r="5" fill="#f59e0b"/>
+                            <text x="-90" y="5" font-family="Inter" font-size="11" fill="#f59e0b">|-⟩</text>
+                            
+                            <text x="0" y="45" font-family="Inter" font-size="11" fill="#ef4444" text-anchor="middle">Z-Gate (180°)</text>
+                            <text x="0" y="120" font-family="Inter" font-size="13" font-weight="600" fill="#a5b4fc" text-anchor="middle">Z-Rotation</text>
+                        </g>
+
+                        <!-- X-Rotation Sphere -->
+                        <g transform="translate(400, 150)">
+                            <circle cx="0" cy="0" r="85" stroke="#475569" fill="url(#blochGrad)" stroke-width="2"/>
+                            <ellipse cx="0" cy="0" rx="85" ry="28" stroke="#64748b" fill="none" stroke-dasharray="4,4"/>
+                            <line x1="0" y1="-85" x2="0" y2="85" stroke="#64748b" stroke-width="1.5"/>
+                            <text x="-15" y="-95" font-family="Inter" font-size="12" fill="#94a3b8">|0⟩</text>
+                            <text x="-15" y="105" font-family="Inter" font-size="12" fill="#94a3b8">|1⟩</text>
+                            
+                            <!-- State at |0⟩ -->
+                            <circle cx="0" cy="-80" r="6" fill="#06b6d4"/>
+                            
+                            <!-- Rotation arc -->
+                            <path d="M 5 -75 Q 70 0 5 75" stroke="#ef4444" stroke-width="2.5" fill="none" marker-end="url(#arrowRed)"/>
+                            <circle cx="0" cy="80" r="6" fill="#f59e0b"/>
+                            
+                            <text x="75" y="5" font-family="Inter" font-size="11" fill="#ef4444">X-Gate (180°)</text>
+                            <text x="0" y="120" font-family="Inter" font-size="13" font-weight="600" fill="#a5b4fc" text-anchor="middle">X-Rotation</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <footer>
+        <p>© 2025 Quantum Computing Study Guide | Built for Learning</p>
+    </footer>
+</body>
+</html>
