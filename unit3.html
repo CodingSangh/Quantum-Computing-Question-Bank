@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 3: Quantum Computing Algorithms</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            /* Core Brand Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            /* Theme Variables (Default Dark) */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --code-bg: #0d1117;
+            --math-bg: rgba(99, 102, 241, 0.1);
+            --gate-bg: rgba(99, 102, 241, 0.05);
+            --table-head-bg: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --table-row-even: rgba(99, 102, 241, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --math-bg: rgba(99, 102, 241, 0.05);
+            --gate-bg: rgba(99, 102, 241, 0.05);
+            --table-row-even: rgba(99, 102, 241, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 4rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-card);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 200;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.4); }
+
+        /* Main Layout */
+        main { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2); }
+
+        .question-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .question-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            color: white;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .question-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .answer-content { padding: 1.5rem; }
+
+        /* Typography & Components */
+        .section-title, h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+        
+        h4 {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem;
+        }
+
+        /* Info Boxes */
+        .info-box, .highlight-box {
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        /* Mapping old classes to new style logic */
+        .highlight-box { background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary); }
+        .highlight-box.success { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); }
+        .highlight-box.warning { background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning); }
+
+        /* Math Blocks */
+        .math-block {
+            background: var(--math-bg);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        /* Lists */
+        ul, ol { margin: 1rem 0; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; color: var(--text-secondary); }
+        li strong { color: var(--text-primary); }
+
+        /* Tables */
+        .table-wrapper, .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        th { background: var(--table-head-bg); color: white; padding: 1rem; text-align: left; font-weight: 600; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); background: var(--bg-card); }
+        tr:hover td { background: var(--table-row-even); }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .tag-quantum { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .tag-classical { background: rgba(236, 72, 153, 0.2); color: #ec4899; }
+
+        /* Diagrams */
+        .diagram-container {
+            background: white; /* Always white for visibility */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .diagram-title {
+            text-align: center;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-card);
+            text-align: center;
+            padding: 3rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Scroll Top */
+        .scroll-top {
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 1000;
+            color: white;
+        }
+        .scroll-top.visible { opacity: 1; visibility: visible; }
+
+        
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            /* 1. Force all Tables to scroll horizontally */
+            table, .table-wrapper, .comparison-table {
+                display: block !important;       /* Makes table behave like a block to allow scrolling */
+                width: 100% !important;          /* Forces container to fit screen */
+                overflow-x: auto !important;     /* Adds horizontal scrollbar if content is too wide */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+            }
+
+            /* 2. Fix SVG Diagrams scaling */
+            .diagram-container {
+                padding: 10px !important;        /* Reduce padding to give diagrams more space */
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .diagram-container svg {
+                width: 100% !important;          /* Force SVG to fit container width */
+                height: auto !important;         /* Maintain aspect ratio */
+                max-width: 100%;                 /* Prevent overflowing */
+            }
+
+            /* 3. Prevent general page overflow */
+            body, main, .container {
+                overflow-x: hidden;              /* Stops the whole page from wiggling left/right */
+                width: 100%;
+            }
+
+            .theme-toggle {
+                position: fixed !important; /* Forces it to stay in place on screen */
+                top: 15px !important;       /* Distance from top edge */
+                right: 15px !important;     /* Distance from right edge */
+                z-index: 2000 !important;   /* Ensures it sits on top of all other content */
+                
+                /* Optional: Add a slight background/shadow so it's visible over text */
+                background: rgba(30, 41, 59, 0.8); /* Dark semi-transparent background */
+                backdrop-filter: blur(5px);        /* Blur effect for modern look */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            /* Adjust icon color for visibility on mixed backgrounds */
+            [data-theme="light"] .theme-toggle {
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid rgba(0,0,0,0.1);
+                color: #333;
+            }
+            
+            nav {
+                position: relative;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚛️ Quantum Computing Algorithms</h1>
+        <p>A comprehensive study guide covering quantum parallelism, interference, and key quantum algorithms with their complexity analysis</p>
+        
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+            <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#q1">Q1: Parallelism</a></li>
+            <li><a href="#q2">Q2: Deutsch-Jozsa</a></li>
+            <li><a href="#q3">Q3: Bernstein-Vazirani</a></li>
+            <li><a href="#q4">Q4: Simon's</a></li>
+            <li><a href="#q5">Q5: Grover's</a></li>
+            <li><a href="#q6">Q6: QFT</a></li>
+            <li><a href="#q7">Q7: Shor's</a></li>
+            <li><a href="#q8">Q8: Complexity</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <article class="question-card" id="q1">
+            <div class="question-header">
+                <span class="question-number">1</span>
+                <h2>Describe quantum parallelism and interference, explaining their roles in speeding up quantum algorithms.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. Quantum Parallelism</h3>
+                
+                <h4>Definition</h4>
+                <p>Quantum parallelism is the ability of a quantum computer to evaluate a function for many different input values simultaneously. This arises from the principle of <strong>superposition</strong>.</p>
+
+                <h4>Mechanism</h4>
+                <p>Instead of processing inputs sequentially (like a classical computer), we initialize a register of \(n\) qubits into a superposition of all possible \(2^n\) basis states using Hadamard gates.</p>
+                
+                <div class="math-block">
+                    \[|\psi\rangle = H^{\otimes n}|0\rangle^{\otimes n} = \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} |x\rangle\]
+                </div>
+
+                <h4>Function Evaluation</h4>
+                <p>If we apply a quantum circuit (Oracle \(U_f\)) that computes a function \(f(x)\), it acts on the superposition state:</p>
+                
+                <div class="math-block">
+                    \[U_f \left( \frac{1}{\sqrt{2^n}} \sum_{x} |x\rangle |0\rangle \right) = \frac{1}{\sqrt{2^n}} \sum_{x} |x\rangle |f(x)\rangle\]
+                </div>
+                
+                <div class="highlight-box success">
+                    In a single step, the quantum computer has computed \(f(x)\) for all \(2^n\) possible values of \(x\).
+                </div>
+
+                <h3>2. Quantum Interference</h3>
+                
+                <h4>Definition</h4>
+                <p>While parallelism creates a massive superposition of all answers, measuring it directly would just give a random result. <strong>Interference</strong> is the process used to manipulate the probability amplitudes of these states to extract the meaningful result.</p>
+
+                <h4>Mechanism</h4>
+                <p>Quantum amplitudes can be positive or negative (complex numbers):</p>
+                <ul>
+                    <li><strong>Constructive Interference:</strong> When amplitudes of the <em>correct</em> solution have the same phase, they add up, increasing the probability of measuring that state.</li>
+                    <li><strong>Destructive Interference:</strong> When amplitudes of <em>incorrect</em> solutions have opposite phases, they cancel each other out, reducing their probability to zero.</li>
+                </ul>
+
+                <h4>Role in Algorithms</h4>
+                <p>Gates like the Hadamard and Phase Shift are used to create interference patterns that amplify the correct answer and suppress the wrong ones.</p>
+
+                <h3>3. Role in Speeding Up Algorithms</h3>
+                <p>Quantum speedup is achieved by combining these two principles:</p>
+                <ol>
+                    <li><strong>Parallelism</strong> generates the entire solution space (all possible \(f(x)\)) in one operation.</li>
+                    <li><strong>Interference</strong> filters this massive amount of data to isolate the correct answer.</li>
+                </ol>
+
+                <div class="highlight-box">
+                    <strong>Example (Deutsch-Jozsa):</strong> Parallelism computes the function for all inputs. Interference (via final Hadamard gates) causes states to cancel out such that we measure \(|00..0\rangle\) if the function is constant and a non-zero state if balanced.
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Example (Grover's Search):</strong> Parallelism creates a database of \(N\) items. Interference (Amplitude Amplification) iteratively increases the amplitude of the marked item while canceling out others, achieving a \(\sqrt{N}\) speedup.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 1: Quantum Parallelism creates superposition, Oracle marks solutions, Interference amplifies correct answers</p>
+                    <svg width="600" height="280" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4facfe;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:0.3" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f093fb;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#f5576c;stop-opacity:0.3" />
+                            </linearGradient>
+                            <linearGradient id="oracleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b" />
+                                <stop offset="100%" style="stop-color:#f97316" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                            </marker>
+                        </defs>
+
+                        <rect width="100%" height="100%" fill="transparent"/>
+
+                        <text x="100" y="30" font-family="system-ui" font-size="14" font-weight="bold" fill="#4facfe" text-anchor="middle">1. PARALLELISM</text>
+                        <rect x="40" y="45" width="120" height="180" rx="12" fill="url(#grad1)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="100" y="75" font-family="system-ui" font-size="12" fill="#94a3b8" text-anchor="middle">Input: |00..0⟩</text>
+                        <line x1="100" y1="90" x2="100" y2="105" stroke="#4facfe" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <rect x="70" y="110" width="60" height="30" rx="6" fill="#1e293b" stroke="#4facfe" stroke-width="2"/>
+                        <text x="100" y="130" font-family="system-ui" font-size="14" font-weight="bold" fill="#4facfe" text-anchor="middle">H⊗ⁿ</text>
+                        <line x1="100" y1="145" x2="100" y2="160" stroke="#4facfe" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <text x="100" y="185" font-family="system-ui" font-size="11" fill="#f1f5f9" text-anchor="middle">Superposition:</text>
+                        <text x="100" y="205" font-family="system-ui" font-size="13" fill="#22c55e" text-anchor="middle">∑ |x⟩</text>
+
+                        <line x1="170" y1="130" x2="220" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                        <rect x="230" y="90" width="120" height="100" rx="12" fill="url(#oracleGrad)" stroke="#f59e0b" stroke-width="2" filter="url(#glow)"/>
+                        <text x="290" y="135" font-family="system-ui" font-size="16" font-weight="bold" fill="#1e293b" text-anchor="middle">Oracle Uᶠ</text>
+                        <text x="290" y="160" font-family="system-ui" font-size="11" fill="#1e293b" text-anchor="middle">Global Operation</text>
+
+                        <line x1="360" y1="130" x2="410" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                        <text x="500" y="30" font-family="system-ui" font-size="14" font-weight="bold" fill="#f5576c" text-anchor="middle">2. INTERFERENCE</text>
+                        <rect x="420" y="45" width="140" height="180" rx="12" fill="url(#grad2)" stroke="#f5576c" stroke-width="2"/>
+                        
+                        <g opacity="0.6">
+                            <path d="M 445 85 Q 465 65 485 85 T 525 85" stroke="#64748b" stroke-width="2" fill="none"/>
+                            <path d="M 445 95 Q 465 115 485 95 T 525 95" stroke="#64748b" stroke-width="2" fill="none"/>
+                            <text x="490" y="120" font-family="system-ui" font-size="10" fill="#64748b" text-anchor="middle">Wrong → Cancel</text>
+                        </g>
+
+                        <g>
+                            <path d="M 445 155 Q 475 125 505 155" stroke="#22c55e" stroke-width="3" fill="none"/>
+                            <path d="M 445 155 Q 475 125 505 155" stroke="#22c55e" stroke-width="3" fill="none"/>
+                            <circle cx="475" cy="135" r="4" fill="#22c55e"/>
+                            <text x="490" y="190" font-family="system-ui" font-size="10" fill="#22c55e" text-anchor="middle">Correct → Amplify</text>
+                        </g>
+
+                        <rect x="475" y="200" width="60" height="25" rx="6" fill="#22c55e" stroke="none"/>
+                        <text x="505" y="218" font-family="system-ui" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">Result!</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q2">
+            <div class="question-header">
+                <span class="question-number">2</span>
+                <h2>Explain the Deutsch-Jozsa algorithm in detail. Describe the oracle, circuit steps, and the reason why the algorithm works faster than classical methods.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. The Problem Statement</h3>
+                <p>The Deutsch-Jozsa algorithm solves a specific "black box" problem. We are given a function \(f(x)\) that takes an \(n\)-bit input and produces a 1-bit output (\(f: \{0,1\}^n \to \{0,1\}\)). We are promised that the function is either:</p>
+                <ul>
+                    <li><strong>Constant:</strong> The output is the same (0 or 1) for all inputs.</li>
+                    <li><strong>Balanced:</strong> The output is 0 for half of the inputs and 1 for the other half.</li>
+                </ul>
+                <p><strong>Goal:</strong> Determine if \(f\) is constant or balanced using the minimum number of queries.</p>
+
+                <h3>2. The Quantum Oracle (\(U_f\))</h3>
+                <p>The function is implemented as a unitary operator (Oracle) \(U_f\).</p>
+                
+                <h4>Standard Action</h4>
+                <div class="math-block">
+                    \[U_f |x\rangle |y\rangle = |x\rangle |y \oplus f(x)\rangle\]
+                </div>
+
+                <h4>Phase Kickback</h4>
+                <p>To exploit quantum interference, we set the target qubit to the state \(|-\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}\). When \(U_f\) is applied, the value of \(f(x)\) is "kicked back" into the phase of the input state:</p>
+                
+                <div class="math-block">
+                    \[U_f |x\rangle |-\rangle = (-1)^{f(x)} |x\rangle |-\rangle\]
+                </div>
+                
+                <div class="highlight-box">
+                    This encodes the function's information into the phase of the superposition.
+                </div>
+
+                <h3>3. Circuit Steps</h3>
+                <p>The algorithm uses two registers: an \(n\)-qubit Data Register (initialized to \(|0\rangle^{\otimes n}\)) and a 1-qubit Target Register (initialized to \(|1\rangle\)).</p>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Step</th>
+                        <th>Operation</th>
+                        <th>State</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Step 1</strong></td>
+                        <td>Initialization</td>
+                        <td>\(|0\rangle^{\otimes n} |1\rangle\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Step 2</strong></td>
+                        <td>Apply H to all qubits</td>
+                        <td>\(\frac{1}{\sqrt{2^n}} \sum_{x} |x\rangle \otimes |-\rangle\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Step 3</strong></td>
+                        <td>Oracle Query</td>
+                        <td>\(\frac{1}{\sqrt{2^n}} \sum_{x} (-1)^{f(x)} |x\rangle \otimes |-\rangle\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Step 4</strong></td>
+                        <td>Apply H to data register</td>
+                        <td>Interference creates final state</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Step 5</strong></td>
+                        <td>Measurement</td>
+                        <td>All 0s → Constant; Otherwise → Balanced</td>
+                    </tr>
+                </table>
+
+                <h3>4. Quantum Speedup</h3>
+                <div class="highlight-box success">
+                    <strong>Classical Method:</strong> To know for sure if \(f\) is constant or balanced, you might need to check half the possible inputs plus one (\(2^{n-1} + 1\) queries) in the worst case.
+                </div>
+                <div class="highlight-box warning">
+                    <strong>Quantum Method:</strong> The Deutsch-Jozsa algorithm solves the problem with exactly <strong>1 query</strong> to the oracle, regardless of the input size \(n\). This demonstrates an exponential separation between classical and quantum query complexity.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 2: Deutsch-Jozsa Algorithm Circuit</p>
+                    <svg width="600" height="220" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="hGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4facfe" />
+                                <stop offset="100%" style="stop-color:#00f2fe" />
+                            </linearGradient>
+                            <linearGradient id="oracleGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b" />
+                                <stop offset="100%" style="stop-color:#f97316" />
+                            </linearGradient>
+                            <linearGradient id="measureGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8b5cf6" />
+                                <stop offset="100%" style="stop-color:#6366f1" />
+                            </linearGradient>
+                        </defs>
+
+                        <line x1="70" y1="70" x2="540" y2="70" stroke="#475569" stroke-width="2"/>
+                        <line x1="70" y1="150" x2="380" y2="150" stroke="#475569" stroke-width="2"/>
+                        
+                        <text x="50" y="75" font-family="system-ui" font-size="14" fill="#94a3b8" text-anchor="end">|0⟩ⁿ</text>
+                        <text x="50" y="155" font-family="system-ui" font-size="14" fill="#94a3b8" text-anchor="end">|1⟩</text>
+
+                        <rect x="90" y="50" width="40" height="40" rx="8" fill="url(#hGrad)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="110" y="77" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="90" y="130" width="40" height="40" rx="8" fill="url(#hGrad)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="110" y="157" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="180" y="40" width="120" height="140" rx="12" fill="url(#oracleGrad2)" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="240" y="105" font-family="system-ui" font-size="20" font-weight="bold" fill="#1e293b" text-anchor="middle">Uᶠ</text>
+                        <text x="240" y="130" font-family="system-ui" font-size="11" fill="#1e293b" text-anchor="middle">Oracle</text>
+
+                        <rect x="340" y="50" width="40" height="40" rx="8" fill="url(#hGrad)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="360" y="77" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="420" y="50" width="50" height="40" rx="8" fill="url(#measureGrad)" stroke="#6366f1" stroke-width="2"/>
+                        <path d="M 435 80 A 15 15 0 0 1 455 80" stroke="#fff" stroke-width="2" fill="none"/>
+                        <line x1="445" y1="80" x2="445" y2="60" stroke="#fff" stroke-width="2"/>
+
+                        <text x="495" y="75" font-family="system-ui" font-size="14" font-weight="bold" fill="#22c55e">Result</text>
+
+                        <rect x="180" y="190" width="180" height="25" rx="6" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1"/>
+                        <text x="270" y="208" font-family="system-ui" font-size="11" fill="#94a3b8" text-anchor="middle">Phase Kickback: (-1)^f(x)</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q3">
+            <div class="question-header">
+                <span class="question-number">3</span>
+                <h2>Describe the Bernstein-Vazirani algorithm and its circuit construction. Compare its time complexity with the classical approach.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. The Problem Statement</h3>
+                <p>The Bernstein-Vazirani algorithm is designed to solve the "hidden string" problem.</p>
+                
+                <div class="highlight-box">
+                    <strong>Goal:</strong> We are given a function \(f(x)\) that computes the dot product of the input \(x\) and a hidden binary string \(s\) (modulo 2):
+                    <div class="math-block">
+                        \[f(x) = x \cdot s = x_0s_0 \oplus x_1s_1 \oplus ... \oplus x_{n-1}s_{n-1}\]
+                    </div>
+                    <strong>Task:</strong> Find the hidden string \(s = s_0s_1...s_{n-1}\) with the minimum number of queries to the function.
+                </div>
+
+                <h3>2. Circuit Construction</h3>
+                <p>The circuit for the Bernstein-Vazirani algorithm is structurally identical to the Deutsch-Jozsa algorithm but solves a different problem.</p>
+
+                <h4>Registers</h4>
+                <ul>
+                    <li><strong>Data Register:</strong> \(n\) qubits initialized to \(|0\rangle^{\otimes n}\).</li>
+                    <li><strong>Target Register:</strong> 1 qubit initialized to \(|1\rangle\) (to enable phase kickback).</li>
+                </ul>
+
+                <h4>Steps</h4>
+                <ol>
+                    <li><strong>Initialization:</strong> Start with \(|0\rangle^{\otimes n} \otimes |1\rangle\).</li>
+                    <li><strong>Superposition:</strong> Apply Hadamard gates (\(H\)) to all \(n+1\) qubits. The data register enters the uniform superposition \(\sum |x\rangle\).</li>
+                    <li><strong>Oracle Query:</strong> Apply the quantum oracle \(U_f\). Due to phase kickback using the \(|-\rangle\) target, the phase \((-1)^{f(x)}\) is added to each term.
+                        <div class="math-block">\[|\psi_2\rangle = \frac{1}{\sqrt{2^n}} \sum_{x} (-1)^{x \cdot s} |x\rangle\]</div>
+                    </li>
+                    <li><strong>Interference:</strong> Apply Hadamard gates (\(H^{\otimes n}\)) to the data register again. This operation transforms the phase encoded state directly into the computational basis state \(|s\rangle\).</li>
+                    <li><strong>Measurement:</strong> Measure the data register. The output will be exactly the hidden string \(s\).</li>
+                </ol>
+
+                <h3>3. Comparison of Time Complexity</h3>
+                
+                <table class="comparison-table">
+                    <tr>
+                        <th>Approach</th>
+                        <th>Queries Required</th>
+                        <th>Complexity</th>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-classical">Classical</span></td>
+                        <td>\(n\) queries (one for each bit of \(s\))</td>
+                        <td>\(O(n)\)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-quantum">Quantum (B-V)</span></td>
+                        <td>1 query</td>
+                        <td>\(O(1)\)</td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box success">
+                    <strong>Advantage:</strong> This provides a polynomial speedup (linear \(O(n)\) vs constant \(O(1)\)) over the classical method.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 3: Bernstein-Vazirani Algorithm Circuit</p>
+                    <svg width="600" height="220" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="hGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4facfe" />
+                                <stop offset="100%" style="stop-color:#00f2fe" />
+                            </linearGradient>
+                            <linearGradient id="oracleGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b" />
+                                <stop offset="100%" style="stop-color:#f97316" />
+                            </linearGradient>
+                        </defs>
+
+                        <line x1="70" y1="70" x2="540" y2="70" stroke="#475569" stroke-width="2"/>
+                        <line x1="70" y1="150" x2="380" y2="150" stroke="#475569" stroke-width="2"/>
+                        
+                        <text x="50" y="75" font-family="system-ui" font-size="14" fill="#94a3b8" text-anchor="end">|0⟩ⁿ</text>
+                        <text x="50" y="155" font-family="system-ui" font-size="14" fill="#94a3b8" text-anchor="end">|1⟩</text>
+
+                        <rect x="90" y="50" width="40" height="40" rx="8" fill="url(#hGrad3)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="110" y="77" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="90" y="130" width="40" height="40" rx="8" fill="url(#hGrad3)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="110" y="157" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="180" y="40" width="120" height="140" rx="12" fill="url(#oracleGrad3)" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="240" y="100" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">Uᶠ</text>
+                        <text x="240" y="125" font-family="system-ui" font-size="11" fill="#1e293b" text-anchor="middle">f(x) = x·s</text>
+
+                        <rect x="340" y="50" width="40" height="40" rx="8" fill="url(#hGrad3)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="360" y="77" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="420" y="50" width="50" height="40" rx="8" fill="linear-gradient(135deg, #8b5cf6, #6366f1)" stroke="#6366f1" stroke-width="2"/>
+                        <path d="M 435 80 A 15 15 0 0 1 455 80" stroke="#fff" stroke-width="2" fill="none"/>
+                        <line x1="445" y1="80" x2="445" y2="60" stroke="#fff" stroke-width="2"/>
+
+                        <text x="500" y="70" font-family="system-ui" font-size="16" font-weight="bold" fill="#22c55e">|s⟩</text>
+
+                        <rect x="180" y="190" width="180" height="25" rx="6" fill="rgba(34, 197, 94, 0.2)" stroke="#22c55e"/>
+                        <text x="270" y="208" font-family="system-ui" font-size="11" fill="#22c55e" text-anchor="middle">Reveals string 's' in 1 shot!</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q4">
+            <div class="question-header">
+                <span class="question-number">4</span>
+                <h2>Explain Simon's algorithm step by step. Discuss its significance in demonstrating exponential quantum advantage.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. The Problem Statement (Simon's Problem)</h3>
+                <p>We are given a "black box" function \(f\) mapping \(n\)-bit strings to \(n\)-bit strings (\(f: \{0,1\}^n \to \{0,1\}^n\)). We are promised that there exists a hidden binary string \(s\) (the period) such that:</p>
+                
+                <div class="math-block">
+                    \[f(x) = f(y) \iff y = x \oplus s\]
+                </div>
+
+                <ul>
+                    <li>If \(s = 00...0\), the function is <strong>one-to-one</strong>.</li>
+                    <li>If \(s \neq 0\), the function is <strong>two-to-one</strong> (two inputs map to the same output).</li>
+                </ul>
+                <p><strong>Goal:</strong> Find the hidden string \(s\) with the minimum number of queries.</p>
+
+                <h3>2. Circuit Construction</h3>
+                <p>The circuit uses two registers of \(n\) qubits each:</p>
+                <ul>
+                    <li><strong>Register 1 (Data):</strong> Initialized to \(|0\rangle^{\otimes n}\).</li>
+                    <li><strong>Register 2 (Target):</strong> Initialized to \(|0\rangle^{\otimes n}\).</li>
+                    <li><strong>Gates:</strong> Hadamard gates on the first register and a Quantum Oracle \(U_f\) acting on both.</li>
+                </ul>
+
+                <h3>3. Step-by-Step Execution</h3>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Step</th>
+                        <th>Description</th>
+                        <th>State</th>
+                    </tr>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td>Initialization</td>
+                        <td>\(|0\rangle^{\otimes n} |0\rangle^{\otimes n}\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td>Superposition (H on Register 1)</td>
+                        <td>\(\frac{1}{\sqrt{2^n}} \sum_{x} |x\rangle |0\rangle\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td>Oracle Query</td>
+                        <td>\(\frac{1}{\sqrt{2^n}} \sum_{x} |x\rangle |f(x)\rangle\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td>Collapse (after Register 2 measurement)</td>
+                        <td>\(\frac{1}{\sqrt{2}} (|x\rangle + |x \oplus s\rangle)\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td>Second Hadamard on Register 1</td>
+                        <td>States \(|z\rangle\) where \(z \cdot s = 0\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>6</strong></td>
+                        <td>Measure & Classical Post-processing</td>
+                        <td>Solve linear equations to find \(s\)</td>
+                    </tr>
+                </table>
+
+                <h3>4. Significance: Exponential Quantum Advantage</h3>
+                <p>Simon's algorithm is historically critical because it provided the first proof of an <strong>exponential speedup</strong> for a quantum algorithm solving a specific oracle problem compared to any classical probabilistic algorithm.</p>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Method</th>
+                        <th>Complexity</th>
+                        <th>Explanation</th>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-classical">Classical</span></td>
+                        <td>\(O(2^{n/2})\)</td>
+                        <td>Birthday Paradox - must find collision</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-quantum">Quantum</span></td>
+                        <td>\(O(n)\)</td>
+                        <td>Linear equations from n measurements</td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box success">
+                    <strong>Legacy:</strong> Simon's algorithm inspired Peter Shor to develop <strong>Shor's Algorithm</strong> for factoring. Shor realized that if we could find the "period" of a function efficiently (like Simon did), we could break RSA encryption.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 4: Simon's Algorithm Circuit</p>
+                    <svg width="600" height="240" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="hGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4facfe" />
+                                <stop offset="100%" style="stop-color:#00f2fe" />
+                            </linearGradient>
+                        </defs>
+
+                        <line x1="70" y1="70" x2="550" y2="70" stroke="#475569" stroke-width="2"/>
+                        <line x1="70" y1="150" x2="400" y2="150" stroke="#475569" stroke-width="2"/>
+                        
+                        <text x="50" y="75" font-family="system-ui" font-size="14" fill="#94a3b8" text-anchor="end">|0⟩ⁿ</text>
+                        <text x="50" y="155" font-family="system-ui" font-size="14" fill="#94a3b8" text-anchor="end">|0⟩ⁿ</text>
+
+                        <rect x="90" y="50" width="40" height="40" rx="8" fill="url(#hGrad4)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="110" y="77" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="170" y="40" width="110" height="140" rx="12" fill="linear-gradient(135deg, #f59e0b, #f97316)" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="225" y="105" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">Uᶠ</text>
+                        <text x="225" y="130" font-family="system-ui" font-size="10" fill="#1e293b" text-anchor="middle">|x⟩|f(x)⟩</text>
+
+                        <rect x="310" y="130" width="45" height="40" rx="8" fill="linear-gradient(135deg, #64748b, #475569)" stroke="#64748b" stroke-width="2"/>
+                        <path d="M 322 160 A 12 12 0 0 1 342 160" stroke="#fff" stroke-width="2" fill="none"/>
+                        <line x1="332" y1="160" x2="332" y2="143" stroke="#fff" stroke-width="2"/>
+                        <text x="332" y="190" font-family="system-ui" font-size="9" fill="#64748b" text-anchor="middle">(Optional)</text>
+
+                        <rect x="380" y="50" width="40" height="40" rx="8" fill="url(#hGrad4)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="400" y="77" font-family="system-ui" font-size="18" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="450" y="50" width="45" height="40" rx="8" fill="linear-gradient(135deg, #8b5cf6, #6366f1)" stroke="#6366f1" stroke-width="2"/>
+                        <path d="M 462 80 A 12 12 0 0 1 482 80" stroke="#fff" stroke-width="2" fill="none"/>
+                        <line x1="472" y1="80" x2="472" y2="63" stroke="#fff" stroke-width="2"/>
+
+                        <text x="515" y="65" font-family="system-ui" font-size="14" font-weight="bold" fill="#f1f5f9">z</text>
+                        <text x="515" y="85" font-family="system-ui" font-size="11" fill="#22c55e">z·s = 0</text>
+
+                        <rect x="170" y="205" width="200" height="25" rx="6" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1"/>
+                        <text x="270" y="222" font-family="system-ui" font-size="10" fill="#94a3b8" text-anchor="middle">Repeat ~n times → Solve for s</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q5">
+            <div class="question-header">
+                <span class="question-number">5</span>
+                <h2>Discuss Grover's search algorithm. Explain amplitude amplification, oracle design, and its quadratic speedup.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. Grover's Search Algorithm</h3>
+                <p>Grover's algorithm is a quantum algorithm used for searching an unsorted database or solving unstructured problems.</p>
+                <ul>
+                    <li><strong>Goal:</strong> Given a search space of size \(N\) with one unique marked item \(w\) (the "winner"), find \(w\) with high probability.</li>
+                    <li><strong>Significance:</strong> It provides a provable speedup over the best possible classical algorithm for the same task.</li>
+                </ul>
+
+                <h3>2. Oracle Design (Phase Inversion)</h3>
+                <p>The "Oracle" is a black-box function that recognizes the solution. In Grover's algorithm, the oracle (\(U_\omega\)) is designed to flip the <strong>phase</strong> (sign) of the solution state \(|w\rangle\) while leaving all other states unchanged.</p>
+                
+                <div class="math-block">
+                    \[U_\omega |x\rangle = \begin{cases} -|x\rangle & \text{if } x = w \\ |x\rangle & \text{if } x \neq w \end{cases}\]
+                </div>
+                
+                <div class="math-block">
+                    \[U_\omega = I - 2|w\rangle\langle w|\]
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Effect:</strong> This operation marks the solution state in the superposition by negating its amplitude, preparing it for amplification.
+                </div>
+
+                <h3>3. Amplitude Amplification (The Grover Iteration)</h3>
+                <p>Merely flipping the sign doesn't increase the probability of measuring \(|w\rangle\) (since \(|-\alpha|^2 = |\alpha|^2\)). We need <strong>Amplitude Amplification</strong> to convert this phase difference into a magnitude difference. This is achieved by the <strong>Diffusion Operator</strong> (\(U_s\)).</p>
+
+                <h4>The Diffusion Operator</h4>
+                <p>This step performs an "inversion about the mean." It amplifies amplitudes that are above the average and suppresses those below it.</p>
+                <div class="math-block">
+                    \[U_s = 2|s\rangle\langle s| - I\]
+                </div>
+                <p>(Where \(|s\rangle\) is the equal superposition of all states).</p>
+
+                <h4>Geometric Interpretation</h4>
+                <p>The algorithm can be visualized as a rotation in a 2D plane spanned by the uniform superposition \(|s\rangle\) and the winner \(|w\rangle\):</p>
+                <ol>
+                    <li>The Oracle reflects the state vector across the "non-winner" axis.</li>
+                    <li>The Diffusion operator reflects the state vector across the initial superposition \(|s\rangle\).</li>
+                    <li><strong>Result:</strong> The combined operation rotates the state vector closer to the target \(|w\rangle\) by an angle \(\theta \approx 2/\sqrt{N}\) in each step.</li>
+                </ol>
+
+                <h3>4. Quadratic Speedup</h3>
+                
+                <table class="comparison-table">
+                    <tr>
+                        <th>Method</th>
+                        <th>Complexity</th>
+                        <th>Example (N = 1,000,000)</th>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-classical">Classical</span></td>
+                        <td>\(O(N)\)</td>
+                        <td>~500,000 steps</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-quantum">Quantum (Grover)</span></td>
+                        <td>\(O(\sqrt{N})\)</td>
+                        <td>~1,000 steps</td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box success">
+                    Since \(\sqrt{N}\) is quadratically smaller than \(N\), this is called a <strong>Quadratic Speedup</strong>.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 5: Geometric Visualization of Grover's Amplitude Amplification</p>
+                    <svg width="550" height="320" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#4facfe"/>
+                                <stop offset="100%" style="stop-color:#22c55e"/>
+                            </linearGradient>
+                            <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+                            </marker>
+                            <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#4facfe"/>
+                            </marker>
+                            <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#f5576c"/>
+                            </marker>
+                        </defs>
+
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" stroke-width="0.5"/>
+                        </pattern>
+                        <rect x="60" y="30" width="300" height="250" fill="url(#grid)" opacity="0.3"/>
+
+                        <line x1="80" y1="260" x2="380" y2="260" stroke="#64748b" stroke-width="2"/>
+                        <line x1="80" y1="260" x2="80" y2="50" stroke="#64748b" stroke-width="2"/>
+                        
+                        <text x="390" y="265" font-family="system-ui" font-size="12" fill="#94a3b8">|s'⟩ (Non-solutions)</text>
+                        <text x="70" y="40" font-family="system-ui" font-size="12" fill="#94a3b8" text-anchor="end">|w⟩</text>
+                        <text x="70" y="268" font-family="system-ui" font-size="10" fill="#64748b">O</text>
+
+                        <line x1="80" y1="260" x2="320" y2="220" stroke="#4facfe" stroke-width="3" marker-end="url(#arrowBlue)"/>
+                        <text x="330" y="215" font-family="system-ui" font-size="12" fill="#4facfe">|ψ₀⟩ = |s⟩</text>
+
+                        <line x1="80" y1="260" x2="320" y2="300" stroke="#f5576c" stroke-width="2" stroke-dasharray="6,4"/>
+                        <text x="330" y="305" font-family="system-ui" font-size="11" fill="#f5576c">After Oracle</text>
+
+                        <line x1="80" y1="260" x2="280" y2="130" stroke="#22c55e" stroke-width="3" marker-end="url(#arrowGreen)"/>
+                        <text x="290" y="125" font-family="system-ui" font-size="12" fill="#22c55e">|ψ₁⟩ (Closer!)</text>
+
+                        <line x1="80" y1="260" x2="80" y2="80" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="80" cy="70" r="8" fill="#f59e0b"/>
+                        <text x="95" y="75" font-family="system-ui" font-size="11" fill="#f59e0b">Target |w⟩</text>
+
+                        <path d="M 120 250 A 45 45 0 0 0 125 230" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+                        <path d="M 130 240 A 60 60 0 0 0 150 200" stroke="#22c55e" stroke-width="1.5" fill="none"/>
+                        <text x="155" y="230" font-family="system-ui" font-size="11" fill="#94a3b8">θ</text>
+                        <text x="165" y="205" font-family="system-ui" font-size="11" fill="#22c55e">2θ</text>
+
+                        <rect x="400" y="50" width="140" height="100" rx="10" fill="rgba(30, 41, 59, 0.9)" stroke="#475569"/>
+                        <text x="415" y="75" font-family="system-ui" font-size="11" font-weight="bold" fill="#f1f5f9">Each Iteration:</text>
+                        <line x1="415" y1="90" x2="445" y2="90" stroke="#f5576c" stroke-width="2"/>
+                        <text x="455" y="94" font-family="system-ui" font-size="10" fill="#94a3b8">Oracle flip</text>
+                        <line x1="415" y1="110" x2="445" y2="110" stroke="#22c55e" stroke-width="2"/>
+                        <text x="455" y="114" font-family="system-ui" font-size="10" fill="#94a3b8">Diffusion</text>
+                        <text x="415" y="138" font-family="system-ui" font-size="10" fill="#64748b">Rotates by 2θ</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q6">
+            <div class="question-header">
+                <span class="question-number">6</span>
+                <h2>Describe the Quantum Fourier Transform (QFT). Provide its circuit implementation and explain how it is used in Shor's algorithm.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. Quantum Fourier Transform (QFT)</h3>
+                <p>The Quantum Fourier Transform (QFT) is the quantum analogue of the classical Discrete Fourier Transform (DFT). It transforms a quantum state from the <strong>Computational Basis</strong> (time domain) to the <strong>Fourier Basis</strong> (frequency domain).</p>
+
+                <h4>Mathematical Definition</h4>
+                <p>For a basis state \(|x\rangle\) in an \(N\)-dimensional Hilbert space (where \(N=2^n\)), the QFT transforms it into:</p>
+                
+                <div class="math-block">
+                    \[QFT|x\rangle = \frac{1}{\sqrt{N}} \sum_{y=0}^{N-1} e^{2\pi i \frac{xy}{N}} |y\rangle\]
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Effect:</strong> It maps the state \(|0\rangle\) to the uniform superposition \(|+\rangle^{\otimes n}\) (constructive interference) and other states to superpositions with specific phase shifts. It is a unitary change of basis.
+                </div>
+
+                <h3>2. Circuit Implementation</h3>
+                <p>The QFT circuit is constructed using two types of gates:</p>
+                <ol>
+                    <li><strong>Hadamard Gate (H):</strong> Creates superposition.</li>
+                    <li><strong>Controlled-Phase Rotation (\(R_k\)):</strong> Adds a phase shift depending on the state of another qubit.
+                        <div class="math-block">
+                            \[R_k = \begin{bmatrix} 1 & 0 \\ 0 & e^{2\pi i / 2^k} \end{bmatrix}\]
+                        </div>
+                    </li>
+                </ol>
+
+                <h4>Construction Steps (n qubits)</h4>
+                <ol>
+                    <li>Apply a <strong>Hadamard gate</strong> to the first qubit (\(q_1\)).</li>
+                    <li>Apply <strong>Controlled-Phase gates</strong> \(R_2, R_3, \dots, R_n\) targeting \(q_1\) controlled by \(q_2, q_3, \dots, q_n\) respectively.</li>
+                    <li>Move to the next qubit (\(q_2\)), apply a Hadamard, and then controlled rotations from the remaining lower qubits.</li>
+                    <li>Repeat until the last qubit is reached.</li>
+                    <li><strong>SWAP Gates:</strong> Finally, apply SWAP gates to reverse the order of the qubits (\(q_1 \leftrightarrow q_n\), etc.), as the circuit produces the output in reversed binary order.</li>
+                </ol>
+
+                <h3>3. Use in Shor's Algorithm</h3>
+                <p>Shor's Algorithm factors large integers \(N\) by finding the period \(r\) of the function \(f(x) = a^x \pmod N\).</p>
+                
+                <div class="highlight-box success">
+                    <strong>Role of QFT:</strong> The QFT acts as the <strong>Period Finding Subroutine</strong>.
+                    <ol>
+                        <li>Shor's algorithm first creates a superposition where the probability amplitudes repeat with period \(r\).</li>
+                        <li>Applying the QFT transforms this "periodic amplitude" in the computational basis into "peaks" in the frequency basis.</li>
+                        <li>Measurement of the state after QFT yields a value \(y\) such that \(\frac{y}{2^n} \approx \frac{k}{r}\). From this, the period \(r\) is extracted using continued fractions, leading to the factors of \(N\).</li>
+                    </ol>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 6: 3-Qubit QFT Circuit with Hadamard, Controlled-Phase, and SWAP gates</p>
+                    <svg width="580" height="260" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="hGradQFT" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4facfe" />
+                                <stop offset="100%" style="stop-color:#00f2fe" />
+                            </linearGradient>
+                            <linearGradient id="rGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b" />
+                                <stop offset="100%" style="stop-color:#f97316" />
+                            </linearGradient>
+                        </defs>
+
+                        <line x1="70" y1="60" x2="530" y2="60" stroke="#475569" stroke-width="2"/>
+                        <line x1="70" y1="120" x2="530" y2="120" stroke="#475569" stroke-width="2"/>
+                        <line x1="70" y1="180" x2="530" y2="180" stroke="#475569" stroke-width="2"/>
+                        
+                        <text x="50" y="65" font-family="system-ui" font-size="13" fill="#94a3b8" text-anchor="end">|x₁⟩</text>
+                        <text x="50" y="125" font-family="system-ui" font-size="13" fill="#94a3b8" text-anchor="end">|x₂⟩</text>
+                        <text x="50" y="185" font-family="system-ui" font-size="13" fill="#94a3b8" text-anchor="end">|x₃⟩</text>
+
+                        <rect x="90" y="42" width="36" height="36" rx="6" fill="url(#hGradQFT)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="108" y="67" font-family="system-ui" font-size="16" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <line x1="150" y1="60" x2="150" y2="120" stroke="#f59e0b" stroke-width="2"/>
+                        <circle cx="150" cy="120" r="6" fill="#f59e0b"/>
+                        <rect x="135" y="45" width="30" height="25" rx="4" fill="url(#rGrad)" stroke="#f59e0b" stroke-width="1"/>
+                        <text x="150" y="62" font-family="system-ui" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">R₂</text>
+
+                        <line x1="200" y1="60" x2="200" y2="180" stroke="#f59e0b" stroke-width="2"/>
+                        <circle cx="200" cy="180" r="6" fill="#f59e0b"/>
+                        <rect x="185" y="45" width="30" height="25" rx="4" fill="url(#rGrad)" stroke="#f59e0b" stroke-width="1"/>
+                        <text x="200" y="62" font-family="system-ui" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">R₃</text>
+
+                        <rect x="250" y="102" width="36" height="36" rx="6" fill="url(#hGradQFT)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="268" y="127" font-family="system-ui" font-size="16" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <line x1="310" y1="120" x2="310" y2="180" stroke="#f59e0b" stroke-width="2"/>
+                        <circle cx="310" cy="180" r="6" fill="#f59e0b"/>
+                        <rect x="295" y="105" width="30" height="25" rx="4" fill="url(#rGrad)" stroke="#f59e0b" stroke-width="1"/>
+                        <text x="310" y="122" font-family="system-ui" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">R₂</text>
+
+                        <rect x="360" y="162" width="36" height="36" rx="6" fill="url(#hGradQFT)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="378" y="187" font-family="system-ui" font-size="16" font-weight="bold" fill="#1e293b" text-anchor="middle">H</text>
+
+                        <rect x="430" y="40" width="70" height="160" rx="8" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="465" y="100" font-family="system-ui" font-size="11" fill="#6366f1" text-anchor="middle">SWAP</text>
+                        
+                        <line x1="455" y1="60" x2="475" y2="180" stroke="#6366f1" stroke-width="2"/>
+                        <line x1="475" y1="60" x2="455" y2="180" stroke="#6366f1" stroke-width="2"/>
+                        <circle cx="465" cy="120" r="4" fill="#6366f1"/>
+
+                        <text x="520" y="65" font-family="system-ui" font-size="12" fill="#22c55e">|y₃⟩</text>
+                        <text x="520" y="125" font-family="system-ui" font-size="12" fill="#22c55e">|y₂⟩</text>
+                        <text x="520" y="185" font-family="system-ui" font-size="12" fill="#22c55e">|y₁⟩</text>
+
+                        <text x="300" y="235" font-family="system-ui" font-size="11" fill="#64748b" text-anchor="middle">3-Qubit Quantum Fourier Transform Circuit</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q7">
+            <div class="question-header">
+                <span class="question-number">7</span>
+                <h2>Explain Shor's factoring algorithm in detail. Highlight the mathematical basis and why quantum computers can factor integers efficiently.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. Introduction</h3>
+                <p>Shor's Algorithm, proposed by Peter Shor in 1994, is a quantum algorithm for integer factorization. It solves the problem: given a large composite number \(N\), find its prime factors. It is famous because it can break modern RSA encryption, which relies on the difficulty of factoring large numbers.</p>
+
+                <h3>2. Mathematical Basis: Reduction to Period Finding</h3>
+                <p>The core insight of Shor's algorithm is that <strong>factoring</strong> can be reduced to the problem of <strong>Order Finding</strong> (finding the period of a function).</p>
+                
+                <ul>
+                    <li>Consider a function \(f(x) = a^x \pmod N\), where \(a\) is a random integer co-prime to \(N\).</li>
+                    <li>This function is periodic with a period \(r\), meaning \(a^{x+r} \equiv a^x \pmod N\).</li>
+                    <li><strong>Euler's Theorem:</strong> The smallest integer \(r > 0\) such that \(a^r \equiv 1 \pmod N\) is the order of \(a\).</li>
+                </ul>
+
+                <h4>Extracting Factors</h4>
+                <p>If we can find \(r\), and if \(r\) is even, we can compute:</p>
+                <div class="math-block">
+                    \[(a^{r/2} - 1)(a^{r/2} + 1) = a^r - 1 \equiv 0 \pmod N\]
+                </div>
+                <p>The greatest common divisor, \(\text{GCD}(a^{r/2} \pm 1, N)\), will likely yield a non-trivial factor of \(N\).</p>
+
+                <h3>3. The Algorithm Steps</h3>
+                <p>The algorithm combines classical pre/post-processing with a crucial quantum subroutine.</p>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Phase</th>
+                        <th>Step</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><span class="tag tag-classical">Classical</span></td>
+                        <td>1. Pre-processing</td>
+                        <td>Pick random \(a < N\), check GCD(a, N)</td>
+                    </tr>
+                    <tr>
+                        <td>6. Post-processing</td>
+                        <td>Use continued fractions to find \(r\), compute GCD</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><span class="tag tag-quantum">Quantum</span></td>
+                        <td>2. Superposition</td>
+                        <td>Create superposition of all integers \(x\)</td>
+                    </tr>
+                    <tr>
+                        <td>3. Modular Exponentiation</td>
+                        <td>Compute \(a^x \pmod N\) in superposition</td>
+                    </tr>
+                    <tr>
+                        <td>4. QFT</td>
+                        <td>Transform periodic state to frequency domain</td>
+                    </tr>
+                    <tr>
+                        <td>5. Measurement</td>
+                        <td>Obtain value \(y\) related to period \(r\)</td>
+                    </tr>
+                </table>
+
+                <h3>4. Efficiency (Why it works faster)</h3>
+                
+                <table class="comparison-table">
+                    <tr>
+                        <th>Method</th>
+                        <th>Complexity</th>
+                        <th>Practical Impact</th>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-classical">Classical (GNFS)</span></td>
+                        <td>\(O(e^{n^{1/3}})\) - Sub-exponential</td>
+                        <td>Intractable for large \(N\)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag tag-quantum">Quantum (Shor)</span></td>
+                        <td>\(O((\log N)^3)\) - Polynomial</td>
+                        <td>Efficient for any \(N\)</td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box warning">
+                    <strong>The Advantage:</strong> The quantum computer uses <strong>parallelism</strong> to evaluate \(a^x \pmod N\) for all \(x\) simultaneously and <strong>interference</strong> (via QFT) to cancel out all incorrect periods, leaving only the correct one. This transforms an intractable problem into a solvable one.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 7: Shor's Algorithm combines Classical and Quantum processing for efficient factoring</p>
+                    <svg width="580" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="classicalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#64748b" />
+                                <stop offset="100%" style="stop-color:#475569" />
+                            </linearGradient>
+                            <linearGradient id="quantumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4facfe" />
+                                <stop offset="100%" style="stop-color:#00f2fe" />
+                            </linearGradient>
+                            <linearGradient id="qftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#a855f7" />
+                                <stop offset="100%" style="stop-color:#6366f1" />
+                            </linearGradient>
+                            <marker id="flowArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                            </marker>
+                        </defs>
+
+                        <text x="290" y="25" font-family="system-ui" font-size="14" font-weight="bold" fill="#f1f5f9" text-anchor="middle">Shor's Algorithm Flowchart</text>
+
+                        <rect x="30" y="50" width="100" height="60" rx="10" fill="url(#classicalGrad)" stroke="#64748b" stroke-width="2"/>
+                        <text x="80" y="75" font-family="system-ui" font-size="11" font-weight="bold" fill="#f1f5f9" text-anchor="middle">CLASSICAL</text>
+                        <text x="80" y="95" font-family="system-ui" font-size="10" fill="#94a3b8" text-anchor="middle">Choose 'a'</text>
+
+                        <line x1="130" y1="80" x2="160" y2="80" stroke="#64748b" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+                        <rect x="160" y="35" width="280" height="200" rx="15" fill="rgba(79, 172, 254, 0.1)" stroke="#4facfe" stroke-width="2" stroke-dasharray="8,4"/>
+                        <text x="300" y="55" font-family="system-ui" font-size="11" font-weight="bold" fill="#4facfe" text-anchor="middle">⚛️ QUANTUM PERIOD FINDING</text>
+
+                        <rect x="180" y="70" width="80" height="45" rx="8" fill="url(#quantumGrad)" stroke="#4facfe" stroke-width="2"/>
+                        <text x="220" y="88" font-family="system-ui" font-size="10" fill="#1e293b" text-anchor="middle">Superposition</text>
+                        <text x="220" y="102" font-family="system-ui" font-size="9" fill="#1e293b" text-anchor="middle">∑|x⟩</text>
+
+                        <line x1="220" y1="115" x2="220" y2="135" stroke="#4facfe" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+                        <rect x="180" y="140" width="80" height="45" rx="8" fill="linear-gradient(135deg, #f59e0b, #f97316)" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="220" y="158" font-family="system-ui" font-size="10" fill="#1e293b" text-anchor="middle">f(x) = aˣ</text>
+                        <text x="220" y="172" font-family="system-ui" font-size="9" fill="#1e293b" text-anchor="middle">mod N</text>
+
+                        <line x1="260" y1="162" x2="290" y2="162" stroke="#f59e0b" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+                        <rect x="290" y="140" width="70" height="45" rx="8" fill="url(#qftGrad)" stroke="#6366f1" stroke-width="2"/>
+                        <text x="325" y="165" font-family="system-ui" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">QFT</text>
+
+                        <line x1="360" y1="162" x2="390" y2="162" stroke="#6366f1" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+                        <rect x="390" y="140" width="40" height="45" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+                        <path d="M 400 165 A 12 12 0 0 1 420 165" stroke="#fff" stroke-width="2" fill="none"/>
+                        <line x1="410" y1="165" x2="410" y2="148" stroke="#fff" stroke-width="2"/>
+                        <text x="410" y="200" font-family="system-ui" font-size="10" fill="#64748b" text-anchor="middle">y</text>
+
+                        <line x1="440" y1="162" x2="470" y2="162" stroke="#64748b" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+                        <rect x="460" y="130" width="100" height="70" rx="10" fill="url(#classicalGrad)" stroke="#64748b" stroke-width="2"/>
+                        <text x="510" y="155" font-family="system-ui" font-size="11" font-weight="bold" fill="#f1f5f9" text-anchor="middle">CLASSICAL</text>
+                        <text x="510" y="172" font-family="system-ui" font-size="10" fill="#94a3b8" text-anchor="middle">Continued</text>
+                        <text x="510" y="187" font-family="system-ui" font-size="10" fill="#94a3b8" text-anchor="middle">Fractions</text>
+
+                        <line x1="510" y1="200" x2="510" y2="240" stroke="#22c55e" stroke-width="2" marker-end="url(#flowArrow)"/>
+                        <rect x="460" y="245" width="100" height="40" rx="10" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
+                        <text x="510" y="270" font-family="system-ui" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">Factors!</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q8">
+            <div class="question-header">
+                <span class="question-number">8</span>
+                <h2>Compare complexity classes P, NP, and BQP. Discuss the implications of quantum algorithms on classical complexity theory.</h2>
+            </div>
+            <div class="answer-content">
+                <h3>1. Definitions of Complexity Classes</h3>
+                <p>To understand the power of quantum computers, we compare them against classical complexity classes based on the resources (time) required to solve a problem.</p>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Class</th>
+                        <th>Definition</th>
+                        <th>Examples</th>
+                    </tr>
+                    <tr>
+                        <td><strong>P</strong></td>
+                        <td>Problems that can be <strong>solved</strong> by a deterministic classical computer in polynomial time</td>
+                        <td>Multiplication, Sorting, Primality Testing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NP</strong></td>
+                        <td>Problems where a solution can be <strong>verified</strong> by a classical computer in polynomial time</td>
+                        <td>Sudoku, Traveling Salesman, Factoring</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BQP</strong></td>
+                        <td>Problems that can be solved by a <strong>Quantum Computer</strong> in polynomial time with bounded error (≤1/3)</td>
+                        <td>Factoring (Shor), Quantum Simulation</td>
+                    </tr>
+                </table>
+
+                <h3>2. Comparison and Relationships</h3>
+                <p>The exact relationship between these classes is one of the biggest open questions in computer science, but the widely accepted hierarchy is:</p>
+
+                <ol>
+                    <li><strong>\(P \subseteq BQP\):</strong> Any problem a classical computer can solve efficiently, a quantum computer can also solve efficiently (by simulating classical gates reversibly).</li>
+                    <li><strong>\(BQP \not\subseteq P\) (Suspected):</strong> There are problems in BQP (like Integer Factoring using Shor's Algorithm) that are believed <em>not</em> to be in P. This suggests quantum computers are strictly more powerful.</li>
+                    <li><strong>\(NP \not\subseteq BQP\) (Suspected):</strong> It is generally believed that quantum computers cannot solve <strong>NP-Complete</strong> problems efficiently. Grover's provides quadratic speedup, not exponential.</li>
+                    <li><strong>Overlap:</strong> BQP sits somewhere between P and PSPACE, likely intersecting with NP but extending beyond it in some areas.</li>
+                </ol>
+
+                <h3>3. Implications on Classical Complexity Theory</h3>
+                <p>The existence of BQP has profound implications:</p>
+
+                <div class="highlight-box warning">
+                    <h4>Challenge to the Extended Church-Turing Thesis</h4>
+                    <ul>
+                        <li><strong>Classical Thesis:</strong> "Any physically realizable model of computation can be simulated by a Turing machine with polynomial overhead."</li>
+                        <li><strong>Quantum Challenge:</strong> BQP implies this is <strong>false</strong>. Problems like Factoring are in BQP but likely require exponential time on a classical Turing machine. This redefines what "efficiently computable" means in the physical universe.</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Cryptographic Breakdown</h4>
+                    <ul>
+                        <li>Modern cryptography (RSA, ECC) relies on the assumption that Factoring and Discrete Logarithm are <strong>not in P</strong>.</li>
+                        <li>Since these problems <strong>are in BQP</strong> (via Shor's Algorithm), the separation between "easy to verify" (NP) and "easy to solve" (P) is bridged for this specific subset of problems.</li>
+                        <li>This necessitates a move to <strong>Post-Quantum Cryptography</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Figure 8: Relationship between Complexity Classes</p>
+                    <svg width="550" height="350" viewBox="0 0 550 350">
+                        <defs>
+                            <linearGradient id="pspaceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f0f0f0;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e0e0e0;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="npGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#fff3e0;stop-opacity:0.9" />
+                                <stop offset="100%" style="stop-color:#ffe0b2;stop-opacity:0.9" />
+                            </linearGradient>
+                            <linearGradient id="bqpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f3e5f5;stop-opacity:0.7" />
+                                <stop offset="100%" style="stop-color:#e1bee7;stop-opacity:0.7" />
+                            </linearGradient>
+                            <linearGradient id="pGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e0f7fa;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#b2ebf2;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+                            </filter>
+                        </defs>
+
+                        <rect x="30" y="20" width="490" height="310" rx="20" fill="url(#pspaceGrad)" stroke="#9e9e9e" stroke-width="2" filter="url(#shadow)" />
+                        <text x="50" y="50" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#424242">PSPACE</text>
+
+                        <ellipse cx="280" cy="180" rx="180" ry="120" fill="url(#npGrad)" stroke="#ff9800" stroke-width="2" />
+                        <text x="280" y="85" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#e65100">NP</text>
+
+                        <ellipse cx="340" cy="190" rx="110" ry="80" fill="url(#bqpGrad)" stroke="#9c27b0" stroke-width="2" />
+                        <text x="410" y="150" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#7b1fa2">BQP</text>
+
+                        <circle cx="230" cy="210" r="65" fill="url(#pGrad)" stroke="#00bcd4" stroke-width="2" />
+                        <text x="230" y="215" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#006064">P</text>
+
+                        <circle cx="230" cy="230" r="4" fill="#006064" />
+                        <text x="230" y="250" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#006064">Sorting, Primality</text>
+
+                        <circle cx="340" cy="180" r="4" fill="#7b1fa2" />
+                        <text x="340" y="200" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#7b1fa2">Factoring</text>
+                        <text x="340" y="215" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#9c27b0">(In BQP ∩ NP)</text>
+
+                        <circle cx="380" cy="90" r="4" fill="#e65100" />
+                        <text x="380" y="80" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#e65100">NP-Complete</text>
+                        <text x="380" y="105" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#d84315">(Likely not in BQP)</text>
+
+                        <rect x="30" y="290" width="490" height="35" rx="5" fill="rgba(255,255,255,0.8)" stroke="#ccc" />
+                        <text x="50" y="312" font-family="Arial, sans-serif" font-size="11" fill="#333">
+                            <tspan font-weight="bold">Key Insight:</tspan> Quantum computers (BQP) can solve some problems in NP efficiently, but likely not NP-Complete problems.
+                        </text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <p>© 2025 Quantum Computing Study Guide | Built for Learning</p>
+    </footer>
+
+    <button class="scroll-top" id="backToTop" aria-label="Back to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+        const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+        const html = document.documentElement;
+
+        // Check local storage
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', currentTheme);
+        updateIcons(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons(newTheme);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        // Back to top button functionality
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // KaTeX Configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>

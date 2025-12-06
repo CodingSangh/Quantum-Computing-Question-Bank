@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 5: Quantum Machine Learning</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            /* Core Brand Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            /* Theme Variables (Default Dark) */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --code-bg: #0d1117;
+            --math-bg: rgba(99, 102, 241, 0.1);
+            --gate-bg: rgba(99, 102, 241, 0.05);
+            --table-head-bg: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --table-row-even: rgba(99, 102, 241, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --math-bg: rgba(99, 102, 241, 0.05);
+            --gate-bg: rgba(99, 102, 241, 0.05);
+            --table-row-even: rgba(99, 102, 241, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 4rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-card);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 200;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.4); }
+
+        /* Main Layout */
+        main { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2); }
+
+        .question-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .question-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            color: white;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .question-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .answer-content { padding: 1.5rem; }
+
+        /* Typography & Components */
+        .section-title, h2, h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+        
+        h4, h5 {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem;
+        }
+
+        /* Info Boxes */
+        .info-box, .encoding-type {
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid var(--border);
+        }
+        .info-box.concept { background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary); }
+        .highlight-box { background: rgba(6, 182, 212, 0.1); border-left: 4px solid var(--accent); padding: 1.25rem; margin: 1rem 0; border-radius: 0.5rem; }
+        
+        /* Grid Layouts for Pros/Cons */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .pro-box { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 1rem; border-radius: 0.5rem; }
+        .con-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 0.5rem; }
+        .pro-box h5 { color: var(--success); margin: 0 0 0.5rem; }
+        .con-box h5 { color: var(--danger); margin: 0 0 0.5rem; }
+
+        /* Math Blocks */
+        .math-block {
+            background: var(--math-bg);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: var(--table-head-bg); color: white; padding: 1rem; text-align: left; font-weight: 600; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+        tr:hover td { background: var(--table-row-even); }
+
+        /* Diagrams */
+        .diagram-container {
+            background: white; /* Always white for visibility */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .diagram-title {
+            text-align: center;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Challenge List */
+        .challenge-list .challenge-item {
+            background: var(--bg-card-hover);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--warning);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-card);
+            text-align: center;
+            padding: 3rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Scroll Top */
+        .scroll-top {
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 1000;
+            color: white;
+        }
+        .scroll-top.visible { opacity: 1; visibility: visible; }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            /* 1. Force all Tables to scroll horizontally */
+            table, .table-wrapper, .comparison-table {
+                display: block !important;       /* Makes table behave like a block to allow scrolling */
+                width: 100% !important;          /* Forces container to fit screen */
+                overflow-x: auto !important;     /* Adds horizontal scrollbar if content is too wide */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+            }
+
+            /* 2. Fix SVG Diagrams scaling */
+            .diagram-container {
+                padding: 10px !important;        /* Reduce padding to give diagrams more space */
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .diagram-container svg {
+                width: 100% !important;          /* Force SVG to fit container width */
+                height: auto !important;         /* Maintain aspect ratio */
+                max-width: 100%;                 /* Prevent overflowing */
+            }
+
+            /* 3. Prevent general page overflow */
+            body, main, .container {
+                overflow-x: hidden;              /* Stops the whole page from wiggling left/right */
+                width: 100%;
+            }
+
+            .theme-toggle {
+                position: fixed !important; /* Forces it to stay in place on screen */
+                top: 15px !important;       /* Distance from top edge */
+                right: 15px !important;     /* Distance from right edge */
+                z-index: 2000 !important;   /* Ensures it sits on top of all other content */
+                
+                /* Optional: Add a slight background/shadow so it's visible over text */
+                background: rgba(30, 41, 59, 0.8); /* Dark semi-transparent background */
+                backdrop-filter: blur(5px);        /* Blur effect for modern look */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            /* Adjust icon color for visibility on mixed backgrounds */
+            [data-theme="light"] .theme-toggle {
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid rgba(0,0,0,0.1);
+                color: #333;
+            }
+            
+            nav {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚛️ Quantum Machine Learning</h1>
+        <p>Comprehensive Q&A on Quantum Computing & AI Integration</p>
+        
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+            <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#q1">Q1: Encoding</a></li>
+            <li><a href="#q2">Q2: VQCs</a></li>
+            <li><a href="#q3">Q3: QSVM</a></li>
+            <li><a href="#q4">Q4: Annealing</a></li>
+            <li><a href="#q5">Q5: QIO</a></li>
+            <li><a href="#q6">Q6: AI Speedup</a></li>
+            <li><a href="#q7">Q7: Gate vs Annealing</a></li>
+            <li><a href="#q8">Q8: Future Trends</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <article class="question-card" id="q1">
+            <div class="question-header">
+                <span class="question-number">Q1</span>
+                <h2>Describe amplitude encoding, angle encoding, and basis encoding. Discuss the challenges in quantum data loading.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Introduction</h3>
+                <p>Quantum Machine Learning (QML) requires classical data (images, numbers, text) to be converted into quantum states. This process is called <strong>Quantum Embedding</strong> or <strong>Encoding</strong>.</p>
+
+                <h3 class="section-title">Types of Encoding</h3>
+
+                <div class="encoding-type">
+                    <h4>A. Basis Encoding</h4>
+                    <p><strong>Description:</strong> This is the most straightforward method where classical binary data is mapped directly to the computational basis states of qubits.</p>
+                    <p><strong>Mechanism:</strong> If we have a binary string \(x = 101\), we prepare the quantum state \(|101\rangle\). For a dataset of \(M\) samples, we utilize a superposition of these states:</p>
+                    <div class="math-block">
+                        $$|\psi\rangle = \frac{1}{\sqrt{M}} \sum_{m=1}^{M} |x^{(m)}\rangle$$
+                    </div>
+                    <div class="grid-container">
+                        <div class="pro-box">
+                            <h5>✓ Pros</h5>
+                            <p>Easy to implement and debug</p>
+                        </div>
+                        <div class="con-box">
+                            <h5>✗ Cons</h5>
+                            <p>Not qubit-efficient. To store an \(N\)-bit number, you need \(N\) qubits.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="encoding-type">
+                    <h4>B. Amplitude Encoding</h4>
+                    <p><strong>Description:</strong> This method encodes data into the <strong>probability amplitudes</strong> of a quantum state.</p>
+                    <p><strong>Mechanism:</strong> Given a classical vector \(\vec{x} = (x_0, x_1, \dots, x_{N-1})\), we normalize it and map it to a state with \(\log_2 N\) qubits:</p>
+                    <div class="math-block">
+                        $$|\psi\rangle = \sum_{i=0}^{N-1} x_i |i\rangle$$
+                    </div>
+                    <p><em>Example:</em> To store 4 numbers \((0.5, 0.5, 0.5, 0.5)\), we use just 2 qubits: \(0.5|00\rangle + 0.5|01\rangle + 0.5|10\rangle + 0.5|11\rangle\).</p>
+                    <div class="grid-container">
+                        <div class="pro-box">
+                            <h5>✓ Pros</h5>
+                            <p>Extremely efficient (exponential compression). Stores \(2^n\) classical values in \(n\) qubits.</p>
+                        </div>
+                        <div class="con-box">
+                            <h5>✗ Cons</h5>
+                            <p>Preparing this state can be complex.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="encoding-type">
+                    <h4>C. Angle Encoding</h4>
+                    <p><strong>Description:</strong> This method encodes classical features into the <strong>rotation angles</strong> of quantum logic gates.</p>
+                    <p><strong>Mechanism:</strong> For a single feature \(x\), we apply a rotation gate (like \(R_y\)) to a qubit:</p>
+                    <div class="math-block">
+                        $$|\psi\rangle = R_y(x) |0\rangle = \cos(x/2)|0\rangle + \sin(x/2)|1\rangle$$
+                    </div>
+                    <p>For \(N\) features, we typically use \(N\) qubits, each rotated by the corresponding feature value.</p>
+                    <div class="grid-container">
+                        <div class="pro-box">
+                            <h5>✓ Pros</h5>
+                            <p>Very useful for variational circuits and neural networks. Uses constant circuit depth.</p>
+                        </div>
+                        <div class="con-box">
+                            <h5>✗ Cons</h5>
+                            <p>Requires more qubits than amplitude encoding.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Challenges in Quantum Data Loading</h3>
+                <p>While quantum algorithms process data fast, <strong>loading</strong> the data is a major bottleneck (the "Input Problem").</p>
+
+                <div class="challenge-list">
+                    <div class="challenge-item">
+                        <h4>State Preparation Complexity</h4>
+                        <p>Creating an arbitrary Amplitude Encoding state is difficult. To load \(2^n\) distinct amplitudes generally requires a circuit with \(O(2^n)\) gates. This exponential cost can negate the speedup gained by the quantum algorithm itself.</p>
+                    </div>
+                    <div class="challenge-item">
+                        <h4>No-Cloning Constraint</h4>
+                        <p>We cannot copy data easily. If an algorithm requires the input data multiple times (e.g., in an iterative loop), we might have to re-prepare the state from scratch every time.</p>
+                    </div>
+                    <div class="challenge-item">
+                        <h4>Data Sparsity</h4>
+                        <p>Efficient loaders (like qRAM) often assume the data is sparse. For dense datasets (like images), efficient loading remains an open research problem.</p>
+                    </div>
+                    <div class="challenge-item">
+                        <h4>Decoherence</h4>
+                        <p>Complex loading circuits are deep (many gates). By the time the data is loaded, the qubits might have already decohered before computation begins.</p>
+                    </div>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">📊 Three Types of Encoding</p>
+                    <svg width="600" height="280" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e0f7fa;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#b2ebf2;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#fff9c4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#fff59d;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e1bee7;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ce93d8;stop-opacity:1" />
+                            </linearGradient>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+                            </marker>
+                        </defs>
+
+                        <g transform="translate(30, 60)">
+                            <text x="70" y="-15" font-family="Arial" font-size="14" font-weight="bold" fill="#00838f" text-anchor="middle">Basis Encoding</text>
+                            <rect x="0" y="0" width="140" height="90" fill="url(#grad1)" stroke="#00838f" stroke-width="2" rx="10"/>
+                            <text x="70" y="30" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">Data: x = 5 (101)</text>
+                            <line x1="70" y1="40" x2="70" y2="55" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+                            <rect x="25" y="60" width="90" height="25" fill="#00838f" rx="5"/>
+                            <text x="70" y="77" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">|101⟩</text>
+                        </g>
+
+                        <g transform="translate(210, 60)">
+                            <text x="85" y="-15" font-family="Arial" font-size="14" font-weight="bold" fill="#f9a825" text-anchor="middle">Amplitude Encoding</text>
+                            <rect x="0" y="0" width="170" height="130" fill="url(#grad2)" stroke="#f9a825" stroke-width="2" rx="10"/>
+                            <text x="85" y="30" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">Data: [0.6, 0.8]</text>
+                            <line x1="85" y1="40" x2="85" y2="55" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+                            <rect x="10" y="65" width="150" height="30" fill="#f9a825" rx="5"/>
+                            <text x="85" y="85" font-family="Arial" font-size="11" fill="white" text-anchor="middle">|ψ⟩ = 0.6|0⟩ + 0.8|1⟩</text>
+                            <text x="85" y="115" font-family="Arial" font-size="10" fill="#666" text-anchor="middle">(2 numbers in 1 qubit)</text>
+                        </g>
+
+                        <g transform="translate(420, 60)">
+                            <text x="75" y="-15" font-family="Arial" font-size="14" font-weight="bold" fill="#8e24aa" text-anchor="middle">Angle Encoding</text>
+                            <rect x="0" y="0" width="150" height="150" fill="url(#grad3)" stroke="#8e24aa" stroke-width="2" rx="10"/>
+                            <text x="75" y="25" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">Data: x = π/2</text>
+                            
+                            <circle cx="75" cy="80" r="35" fill="none" stroke="#8e24aa" stroke-width="2" />
+                            <line x1="75" y1="80" x2="75" y2="45" stroke="#333" stroke-width="2" />
+                            <line x1="75" y1="80" x2="105" y2="80" stroke="#e91e63" stroke-width="3" marker-end="url(#arrow)" />
+                            <text x="55" y="60" font-family="Arial" font-size="10" fill="#333">|0⟩</text>
+                            <text x="110" y="85" font-family="Arial" font-size="10" fill="#e91e63">|1⟩</text>
+                            
+                            <text x="75" y="140" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">Rotate by x</text>
+                        </g>
+
+                        <text x="100" y="250" font-family="Arial" font-size="10" fill="#90a4ae" text-anchor="middle">N qubits for N bits</text>
+                        <text x="295" y="250" font-family="Arial" font-size="10" fill="#90a4ae" text-anchor="middle">log₂N qubits for N values</text>
+                        <text x="495" y="250" font-family="Arial" font-size="10" fill="#90a4ae" text-anchor="middle">N qubits for N features</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q2">
+            <div class="question-header">
+                <span class="question-number">Q2</span>
+                <h2>Explain Variational Quantum Circuits (VQCs). Describe their structure, optimization loop, and applications in hybrid quantum-classical ML.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Introduction: Variational Quantum Circuits (VQCs)</h3>
+                <p>A Variational Quantum Circuit (VQC), also known as a <strong>Parameterized Quantum Circuit (PQC)</strong>, is the quantum analog of a neural network. It is a quantum circuit containing gates with tunable parameters (like rotation angles) that can be optimized to minimize a cost function. VQCs are the core component of <strong>Quantum Machine Learning (QML)</strong>.</p>
+
+                <h3 class="section-title">Structure of a VQC</h3>
+                <p>A typical VQC consists of three main stages:</p>
+
+                <div class="info-box concept">
+                    <h4>A. State Preparation (Feature Map)</h4>
+                    <ul>
+                        <li>This block encodes classical input data \(x\) into a quantum state \(|\psi(x)\rangle\).</li>
+                        <li>Example: Using <strong>Angle Encoding</strong> gates like \(R_x(x)\) to input data.</li>
+                    </ul>
+                </div>
+
+                <div class="info-box concept">
+                    <h4>B. The Ansatz (Variational Form)</h4>
+                    <ul>
+                        <li>This is the "trainable" part of the circuit. It consists of a sequence of gates parameterized by a set of variables \(\theta\) (weights).</li>
+                        <li>It typically includes <strong>single-qubit rotations</strong> (\(R_y(\theta_1)\), \(R_z(\theta_2)\)) to explore the Hilbert space and <strong>entangling gates</strong> (CNOTs) to capture correlations.</li>
+                        <li>The resulting state is \(|\psi(x, \theta)\rangle = U(\theta)|\psi(x)\rangle\).</li>
+                    </ul>
+                </div>
+
+                <div class="info-box concept">
+                    <h4>C. Measurement</h4>
+                    <ul>
+                        <li>We measure the final state in a specific basis to obtain an expectation value \(\langle O \rangle\).</li>
+                        <li>This value represents the "prediction" of the quantum model.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">The Hybrid Optimization Loop</h3>
+                <p>VQCs operate in a hybrid loop where the workload is split between a quantum processor (QPU) and a classical processor (CPU).</p>
+
+                <ol>
+                    <li><strong>Quantum Step:</strong> The QPU runs the circuit with the current parameters \(\theta\) and measures the output to estimate the Cost Function \(C(\theta)\).</li>
+                    <li><strong>Classical Step:</strong> The CPU takes the measurement results and uses a classical optimizer (like Gradient Descent, Adam, or COBYLA) to calculate new parameters \(\theta_{new}\).</li>
+                    <li><strong>Update:</strong> The new parameters are fed back into the quantum circuit.</li>
+                    <li><strong>Repeat:</strong> This loop continues until the cost function converges (minimizes).</li>
+                </ol>
+
+                <h3 class="section-title">Applications in Hybrid Quantum-Classical ML</h3>
+                <ul>
+                    <li><strong>Variational Quantum Eigensolver (VQE):</strong> Used to find the ground state energy of molecules.</li>
+                    <li><strong>Quantum Neural Networks (QNN):</strong> VQCs act as layers in a neural network for tasks like binary classification.</li>
+                    <li><strong>QAOA:</strong> Used to solve combinatorial optimization problems (like Max-Cut or Traveling Salesman).</li>
+                </ul>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">🔄 The Hybrid Quantum-Classical Loop</p>
+                    <svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="qpuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4fc3f7;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#0288d1;stop-opacity:0.3" />
+                            </linearGradient>
+                            <linearGradient id="cpuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e0e0e0;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#9e9e9e;stop-opacity:0.3" />
+                            </linearGradient>
+                            <marker id="arrowBlack" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+                            </marker>
+                            <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#4caf50" />
+                            </marker>
+                        </defs>
+
+                        <rect x="40" y="50" width="240" height="200" fill="url(#qpuGrad)" stroke="#0288d1" stroke-width="2" rx="15"/>
+                        <text x="160" y="35" font-family="Arial" font-size="14" font-weight="bold" fill="#4fc3f7" text-anchor="middle">Quantum Processor (QPU)</text>
+
+                        <line x1="60" y1="130" x2="260" y2="130" stroke="#666" stroke-width="2"/>
+                        <line x1="60" y1="160" x2="260" y2="160" stroke="#666" stroke-width="2"/>
+                        <line x1="60" y1="190" x2="260" y2="190" stroke="#666" stroke-width="2"/>
+
+                        <rect x="70" y="115" width="50" height="90" fill="#fff" stroke="#333" stroke-width="2" rx="5"/>
+                        <text x="95" y="165" font-family="Arial" font-size="11" text-anchor="middle" fill="#333">Input</text>
+                        <text x="95" y="180" font-family="Arial" font-size="11" text-anchor="middle" fill="#333">(x)</text>
+
+                        <rect x="135" y="115" width="70" height="90" fill="#ffecb3" stroke="#f9a825" stroke-width="2" rx="5"/>
+                        <text x="170" y="155" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Ansatz</text>
+                        <text x="170" y="175" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">U(θ)</text>
+
+                        <rect x="220" y="115" width="50" height="90" fill="#333" stroke="#666" stroke-width="2" rx="5"/>
+                        <text x="245" y="155" font-family="Arial" font-size="10" text-anchor="middle" fill="#fff">Meas</text>
+                        <text x="245" y="175" font-family="Arial" font-size="16" text-anchor="middle" fill="#fff">📊</text>
+
+                        <rect x="340" y="50" width="220" height="200" fill="url(#cpuGrad)" stroke="#666" stroke-width="2" rx="15"/>
+                        <text x="450" y="35" font-family="Arial" font-size="14" font-weight="bold" fill="#9e9e9e" text-anchor="middle">Classical Processor (CPU)</text>
+
+                        <rect x="370" y="100" width="160" height="70" fill="#e1bee7" stroke="#8e24aa" stroke-width="2" rx="10"/>
+                        <text x="450" y="130" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Classical Optimizer</text>
+                        <text x="450" y="150" font-family="Arial" font-size="10" text-anchor="middle" fill="#666">(Gradient Descent)</text>
+
+                        <rect x="390" y="190" width="120" height="40" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5"/>
+                        <text x="450" y="215" font-family="Arial" font-size="11" text-anchor="middle" fill="#333">Cost: C(θ)</text>
+
+                        <path d="M 280 150 L 330 150" stroke="#333" stroke-width="2" marker-end="url(#arrowBlack)" fill="none"/>
+                        <text x="305" y="140" font-family="Arial" font-size="10" fill="#90a4ae" text-anchor="middle">⟨Z⟩</text>
+
+                        <path d="M 450 170 L 450 270 L 160 270 L 160 215" stroke="#4caf50" stroke-width="3" fill="none" marker-end="url(#arrowGreen)"/>
+                        <text x="305" y="290" font-family="Arial" font-size="12" fill="#4caf50" font-weight="bold" text-anchor="middle">Update Parameters (θ)</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q3">
+            <div class="question-header">
+                <span class="question-number">Q3</span>
+                <h2>Discuss Quantum Support Vector Machines (QSVM). Explain feature mapping, kernel computation, and implementation challenges.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Introduction: Quantum Support Vector Machines (QSVM)</h3>
+                <p>A Support Vector Machine (SVM) is a supervised machine learning algorithm that classifies data by finding a hyperplane that best separates two classes. A <strong>QSVM</strong> leverages quantum mechanics to perform this classification, specifically targeting the computationally expensive step of calculating the "Kernel Matrix" for high-dimensional data.</p>
+
+                <h3 class="section-title">Feature Mapping (The Quantum Advantage)</h3>
+                <p>Classical SVMs use the "Kernel Trick" to map non-linearly separable data into a higher-dimensional space where it becomes linearly separable.</p>
+
+                <div class="info-box concept">
+                    <h4>Quantum Feature Map</h4>
+                    <p>In QSVM, we map classical data vector \(\vec{x}\) into a quantum state \(|\Phi(\vec{x})\rangle\) in a high-dimensional Hilbert space.</p>
+                    <div class="math-block">
+                        $$|\Phi(\vec{x})\rangle = U_{\Phi(\vec{x})} |0\rangle^{\otimes n}$$
+                    </div>
+                    <p><strong>Advantage:</strong> The Hilbert space of \(n\) qubits has dimension \(2^n\). This provides an exponentially large feature space that is computationally hard for classical computers to simulate.</p>
+                </div>
+
+                <h3 class="section-title">Kernel Computation</h3>
+                <p>The core of the QSVM is computing the <strong>Kernel Function</strong> \(K(\vec{x}, \vec{z})\), which measures the similarity between two data points.</p>
+
+                <div class="math-block">
+                    $$K(\vec{x}, \vec{z}) = |\langle \Phi(\vec{x}) | \Phi(\vec{z}) \rangle|^2$$
+                </div>
+
+                <div class="info-box concept">
+                    <h4>Circuit Implementation</h4>
+                    <ol>
+                        <li><strong>Initialize:</strong> Start with \(n\) qubits in \(|0\rangle^{\otimes n}\).</li>
+                        <li><strong>Encode x:</strong> Apply the unitary feature map: \(U_{\Phi(\vec{x})}\).</li>
+                        <li><strong>Encode z (Inverse):</strong> Apply the inverse feature map: \(U_{\Phi(\vec{z})}^\dagger\).</li>
+                        <li><strong>Measure:</strong> Measure the probability of finding the all-zero state \(|0\dots0\rangle\).</li>
+                    </ol>
+                    <p><strong>Result:</strong> The probability \(P(0\dots0)\) equals the kernel value \(|\langle \Phi(\vec{z}) | \Phi(\vec{x}) \rangle|^2\).</p>
+                </div>
+
+                <h3 class="section-title">Implementation Challenges</h3>
+                <div class="challenge-list">
+                    <div class="challenge-item">
+                        <h4>Data Loading</h4>
+                        <p>Encoding classical data into quantum states requires complex gate sequences. For large datasets, this leads to decoherence.</p>
+                    </div>
+                    <div class="challenge-item">
+                        <h4>Shot Noise</h4>
+                        <p>The kernel value is estimated via probability. To get precise estimates, we must run the circuit thousands of times.</p>
+                    </div>
+                    <div class="challenge-item">
+                        <h4>Hardware Noise</h4>
+                        <p>Errors in gates and readout can distort the kernel values, making classification inaccurate.</p>
+                    </div>
+                    <div class="challenge-item">
+                        <h4>Barren Plateaus</h4>
+                        <p>In variational approaches, the optimization landscape can become flat (gradients vanish).</p>
+                    </div>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">🔬 Quantum Kernel Estimation Circuit</p>
+                    <svg width="600" height="220" viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowBlk" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+                            </marker>
+                        </defs>
+
+                        <text x="300" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#ffd54f" text-anchor="middle">Overlap Test</text>
+
+                        <line x1="70" y1="100" x2="530" y2="100" stroke="#666" stroke-width="2"/>
+                        <line x1="70" y1="130" x2="530" y2="130" stroke="#666" stroke-width="2"/>
+                        <line x1="70" y1="160" x2="530" y2="160" stroke="#666" stroke-width="2"/>
+
+                        <text x="45" y="105" font-family="Arial" font-size="14" fill="#4fc3f7">|0⟩</text>
+                        <text x="45" y="135" font-family="Arial" font-size="14" fill="#4fc3f7">|0⟩</text>
+                        <text x="45" y="165" font-family="Arial" font-size="14" fill="#4fc3f7">|0⟩</text>
+                        <text x="45" y="185" font-family="Arial" font-size="10" fill="#90a4ae">n qubits</text>
+
+                        <rect x="120" y="80" width="100" height="100" fill="#e0f7fa" stroke="#00838f" stroke-width="2" rx="10"/>
+                        <text x="170" y="135" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#00838f">U(x)</text>
+                        <text x="170" y="200" font-family="Arial" font-size="11" fill="#4fc3f7" text-anchor="middle">Encode x</text>
+
+                        <rect x="260" y="80" width="100" height="100" fill="#ffecb3" stroke="#f9a825" stroke-width="2" rx="10"/>
+                        <text x="310" y="135" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#f9a825">U†(z)</text>
+                        <text x="310" y="200" font-family="Arial" font-size="11" fill="#ffd54f" text-anchor="middle">Uncompute z</text>
+
+                        <rect x="400" y="80" width="70" height="100" fill="#333" stroke="#666" stroke-width="2" rx="10"/>
+                        <text x="435" y="125" font-family="Arial" font-size="20" text-anchor="middle" fill="#fff">M</text>
+                        <text x="435" y="150" font-family="Arial" font-size="12" text-anchor="middle" fill="#aaa">📊</text>
+
+                        <rect x="490" y="95" width="90" height="60" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="8"/>
+                        <text x="535" y="120" font-family="Arial" font-size="11" text-anchor="middle" fill="#333">P(0..0)</text>
+                        <text x="535" y="140" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#2e7d32">= Kernel</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q4">
+            <div class="question-header">
+                <span class="question-number">Q4</span>
+                <h2>Explain quantum annealing. Describe the D-Wave system architecture and how QUBO problems are encoded.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Introduction: Quantum Annealing</h3>
+                <p>Quantum Annealing is a specialized quantum computing method used primarily for <strong>optimization problems</strong>. Unlike the universal gate model, it relies on the <strong>Adiabatic Theorem</strong>.</p>
+
+                <div class="info-box concept">
+                    <h4>Process</h4>
+                    <ol>
+                        <li><strong>Initialization:</strong> The system starts in the ground state of a simple Hamiltonian (\(H_{init}\)), usually a uniform superposition.</li>
+                        <li><strong>Evolution:</strong> The system slowly evolves towards the Problem Hamiltonian (\(H_{prob}\)):
+                            <div class="math-block">$$H(t) = A(t) H_{init} + B(t) H_{prob}$$</div>
+                        </li>
+                        <li><strong>Tunneling:</strong> Quantum annealing uses <strong>Quantum Tunneling</strong> to pass through barriers (unlike classical annealing which must "climb over").</li>
+                        <li><strong>Result:</strong> If evolution is slow enough (adiabatic), the system lands in the ground state of \(H_{prob}\) — the optimal solution.</li>
+                    </ol>
+                </div>
+
+                <h3 class="section-title">D-Wave System Architecture</h3>
+                <p>D-Wave systems are the most prominent commercial quantum annealers.</p>
+                <ul>
+                    <li><strong>Physical Qubits:</strong> Uses <strong>Superconducting Flux Qubits</strong>. Information is encoded in the direction of circulating current.</li>
+                    <li><strong>Couplers:</strong> Superconducting devices that allow qubits to influence each other.</li>
+                    <li><strong>Topology:</strong> Qubits are arranged in specific graphs:
+                        <ul>
+                            <li><strong>Chimera Graph:</strong> (Older) 8-qubit unit cells with sparse connections.</li>
+                            <li><strong>Pegasus/Zephyr:</strong> (Newer) Higher connectivity for complex embeddings.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="section-title">Encoding QUBO Problems</h3>
+                <p>Problems must be formulated as <strong>Quadratic Unconstrained Binary Optimization (QUBO)</strong>:</p>
+                <div class="math-block">
+                    $$E(x) = \sum_i h_i x_i + \sum_{i<j} J_{ij} x_i x_j$$
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li>\(x_i \in \{0, 1\}\) are binary variables</li>
+                    <li>\(h_i\) are linear weights (biases)</li>
+                    <li>\(J_{ij}\) are quadratic strengths (coupler strengths)</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Encoding Constraints:</strong> Since QUBO is "Unconstrained," hard constraints are converted into <strong>Penalty Terms</strong>. Example: To enforce \(x_1 = x_2\), add penalty \(P(x_1 - x_2)^2\).
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">⚡ Quantum Tunneling vs Classical Thermal Jump</p>
+                    <svg width="600" height="280" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#f44336" />
+                            </marker>
+                            <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#9c27b0" />
+                            </marker>
+                        </defs>
+
+                        <text x="100" y="35" font-family="Arial" font-size="14" font-weight="bold" fill="#4fc3f7">Energy Landscape</text>
+
+                        <path d="M 50 80 Q 150 250 200 180 Q 250 80 300 220 Q 350 80 400 180 L 550 180" stroke="#4fc3f7" stroke-width="3" fill="none"/>
+
+                        <circle cx="200" cy="180" r="12" fill="#e0f7fa" stroke="#00838f" stroke-width="2"/>
+                        <text x="200" y="210" font-family="Arial" font-size="11" fill="#4fc3f7" text-anchor="middle">Local Min</text>
+
+                        <circle cx="300" cy="220" r="12" fill="#c8e6c9" stroke="#4caf50" stroke-width="2"/>
+                        <text x="300" y="250" font-family="Arial" font-size="11" fill="#4caf50" text-anchor="middle">Global Min</text>
+
+                        <path d="M 205 165 Q 240 50 290 200" stroke="#f44336" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowRed)"/>
+                        <text x="230" y="45" font-family="Arial" font-size="11" fill="#f44336">Classical</text>
+                        <text x="230" y="60" font-family="Arial" font-size="10" fill="#f44336">(Thermal Jump)</text>
+
+                        <line x1="212" y1="180" x2="285" y2="215" stroke="#9c27b0" stroke-width="4" marker-end="url(#arrowPurple)"/>
+                        <text x="250" y="175" font-family="Arial" font-size="12" fill="#9c27b0" font-weight="bold" text-anchor="middle">Quantum</text>
+                        <text x="250" y="190" font-family="Arial" font-size="10" fill="#9c27b0" text-anchor="middle">Tunneling</text>
+
+                        <rect x="410" y="50" width="170" height="90" fill="#fff9c4" stroke="#f9a825" stroke-width="2" rx="10"/>
+                        <text x="420" y="72" font-family="Arial" font-size="10" fill="#333">Quantum Annealing uses</text>
+                        <text x="420" y="87" font-family="Arial" font-size="10" fill="#333">tunneling to pass through</text>
+                        <text x="420" y="102" font-family="Arial" font-size="10" fill="#333">barriers, finding the global</text>
+                        <text x="420" y="117" font-family="Arial" font-size="10" fill="#333">minimum faster.</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q5">
+            <div class="question-header">
+                <span class="question-number">Q5</span>
+                <h2>Discuss quantum-inspired optimization algorithms. Compare them with quantum and classical approaches.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Quantum-Inspired Optimization Algorithms (QIO)</h3>
+                <p>Quantum-inspired algorithms emulate quantum phenomena (superposition, entanglement, tunneling) to solve complex optimization problems on <strong>standard classical hardware</strong> (CPUs, GPUs, FPGAs).</p>
+
+                <div class="info-box concept">
+                    <h4>Core Principle</h4>
+                    <p>They focus on simulating qubit behavior mathematically rather than physically. By modeling quantum system evolution, they navigate complex energy landscapes more efficiently than traditional heuristics.</p>
+                </div>
+
+                <div class="info-box concept">
+                    <h4>Key Techniques</h4>
+                    <ul>
+                        <li><strong>Tensor Networks:</strong> Compressing quantum state vectors into manageable tensor structures.</li>
+                        <li><strong>Simulated Bifurcation:</strong> Using non-linear dynamics to split continuous variables into binary solutions.</li>
+                        <li><strong>Digital Annealing:</strong> Specialized hardware (like Fujitsu's Digital Annealer) for solving the Ising model.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">Comparison: Classical vs. Quantum-Inspired vs. Quantum</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Classical</th>
+                                <th>Quantum-Inspired</th>
+                                <th>True Quantum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Hardware</strong></td>
+                                <td>Standard CPUs/GPUs</td>
+                                <td>Classical (ASICs/FPGAs)</td>
+                                <td>QPUs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Basic Unit</strong></td>
+                                <td>Bit (0 or 1)</td>
+                                <td>Simulated qubit attributes</td>
+                                <td>Physical Qubit</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Strategy</strong></td>
+                                <td>Thermal Jumps</td>
+                                <td>Simulated Tunneling</td>
+                                <td>Physical Tunneling</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Advantages</strong></td>
+                                <td>Mature, cheap, easy</td>
+                                <td>Better than classical; no cryogenics</td>
+                                <td>Exponential speedup potential</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Limitations</strong></td>
+                                <td>Stuck in local minima</td>
+                                <td>Polynomial speedup only</td>
+                                <td>Noisy; limited qubits; expensive</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Why use Quantum-Inspired?</strong> They serve as a bridge, providing better solutions than traditional algorithms today for industries (logistics, drug discovery) without waiting for fault-tolerant quantum computers.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">🎯 Navigating the Energy Landscape</p>
+                    <svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowR" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#f44336" />
+                            </marker>
+                            <marker id="arrowB" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#2196f3" />
+                            </marker>
+                        </defs>
+
+                        <text x="50" y="35" font-family="Arial" font-size="14" font-weight="bold" fill="#4fc3f7">Cost Function (Energy)</text>
+
+                        <path d="M 50 100 Q 150 280 200 200 Q 250 80 300 200 Q 350 80 400 160 L 550 160" stroke="#4fc3f7" stroke-width="3" fill="none"/>
+
+                        <circle cx="200" cy="200" r="10" fill="#e0e0e0" stroke="#666" stroke-width="2"/>
+                        <text x="200" y="230" font-family="Arial" font-size="11" fill="#bbb" text-anchor="middle">Local Min</text>
+
+                        <circle cx="300" cy="200" r="10" fill="#c8e6c9" stroke="#4caf50" stroke-width="2"/>
+                        <text x="300" y="230" font-family="Arial" font-size="11" fill="#4caf50" text-anchor="middle">Global Min</text>
+
+                        <path d="M 185 185 Q 185 70 285 185" stroke="#f44336" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowR)"/>
+                        <text x="170" y="55" font-family="Arial" font-size="11" fill="#f44336">Classical</text>
+                        <text x="170" y="70" font-family="Arial" font-size="10" fill="#f44336">(Thermal Jump)</text>
+
+                        <path d="M 205 195 Q 250 160 290 195" stroke="#2196f3" stroke-width="3" fill="none" marker-end="url(#arrowB)"/>
+                        <text x="250" y="145" font-family="Arial" font-size="11" fill="#2196f3" text-anchor="middle">Quantum-Inspired</text>
+                        <text x="250" y="160" font-family="Arial" font-size="10" fill="#2196f3" text-anchor="middle">(Simulated Tunneling)</text>
+
+                        <line x1="210" y1="200" x2="288" y2="200" stroke="#9c27b0" stroke-width="4" opacity="0.6"/>
+                        <text x="250" y="260" font-family="Arial" font-size="11" fill="#9c27b0" text-anchor="middle">True Quantum</text>
+                        <text x="250" y="275" font-family="Arial" font-size="10" fill="#9c27b0" text-anchor="middle">(Physical Tunneling)</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q6">
+            <div class="question-header">
+                <span class="question-number">Q6</span>
+                <h2>Explain how quantum computing can accelerate AI applications. Provide case studies (e.g., VQE for ML, QAOA for optimization).</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Accelerating AI with Quantum Computing</h3>
+                <p>Quantum computing accelerates AI/ML by overcoming classical computational bottlenecks:</p>
+                <ul>
+                    <li><strong>Linear Algebra Speedup:</strong> Quantum algorithms (like HHL) perform matrix operations exponentially faster (\(O(\log N)\) vs \(O(N^3)\)).</li>
+                    <li><strong>High-Dimensional Feature Spaces:</strong> Quantum states in \(2^n\) dimensional Hilbert space enable finding patterns invisible to classical kernels.</li>
+                    <li><strong>Sampling:</strong> Quantum computers sample from complex distributions faster than Monte Carlo methods.</li>
+                </ul>
+
+                <h3 class="section-title">Case Study 1: VQE in ML</h3>
+                <div class="info-box concept">
+                    <h4>Variational Quantum Eigensolver</h4>
+                    <p>Originally designed for finding molecular ground state energy, VQE principles apply to <strong>Energy-Based Models</strong> in ML.</p>
+                    <ul>
+                        <li><strong>Concept:</strong> Minimize an "Energy Function" (Loss Function) to find optimal configurations.</li>
+                        <li><strong>Mechanism:</strong>
+                            <ol>
+                                <li>Parameterized circuit prepares trial state \(|\psi(\theta)\rangle\)</li>
+                                <li>Measure energy (expectation value)</li>
+                                <li>Classical optimizer updates \(\theta\) to minimize energy</li>
+                            </ol>
+                        </li>
+                        <li><strong>Acceleration:</strong> Efficiently navigates non-convex landscapes, avoiding local minima.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">Case Study 2: QAOA</h3>
+                <div class="info-box concept">
+                    <h4>Quantum Approximate Optimization Algorithm</h4>
+                    <p>Specialized for <strong>Combinatorial Optimization</strong> — fundamental to many AI tasks.</p>
+                    <ul>
+                        <li><strong>Applications:</strong> Clustering (Max-Cut), Feature Selection, Network Design</li>
+                        <li><strong>Mechanism:</strong>
+                            <ol>
+                                <li>Encode problem into Problem Hamiltonian \(H_P\)</li>
+                                <li>Alternate between problem and mixer Hamiltonians for \(p\) layers</li>
+                                <li>Optimize parameters (\(\gamma, \beta\)) classically</li>
+                            </ol>
+                        </li>
+                        <li><strong>Acceleration:</strong> Heuristic approach for NP-Hard problems faster than brute-force.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">Summary of Speedups</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>AI Task</th>
+                                <th>Classical Bottleneck</th>
+                                <th>Quantum Solution</th>
+                                <th>Speedup</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Optimization</td>
+                                <td>Trapped in local minima</td>
+                                <td>QAOA / Annealing</td>
+                                <td>Polynomial / Constant</td>
+                            </tr>
+                            <tr>
+                                <td>Kernel Methods</td>
+                                <td>High-dim kernel computing</td>
+                                <td>Quantum Kernels</td>
+                                <td>Exponential</td>
+                            </tr>
+                            <tr>
+                                <td>Generative Models</td>
+                                <td>Hard to sample distributions</td>
+                                <td>Quantum Sampling</td>
+                                <td>Polynomial</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">🚀 Quantum Acceleration in the ML Pipeline</p>
+                    <svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowDark" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+                            </marker>
+                        </defs>
+
+                        <rect x="40" y="110" width="90" height="70" fill="#e0e0e0" stroke="#666" stroke-width="2" rx="10"/>
+                        <text x="85" y="140" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Classical</text>
+                        <text x="85" y="160" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Data</text>
+
+                        <line x1="130" y1="145" x2="170" y2="145" stroke="#333" stroke-width="2" marker-end="url(#arrowDark)"/>
+
+                        <rect x="180" y="50" width="250" height="190" fill="rgba(79, 195, 247, 0.1)" stroke="#4fc3f7" stroke-width="2" stroke-dasharray="5,5" rx="15"/>
+                        <text x="305" y="75" font-family="Arial" font-size="14" font-weight="bold" fill="#4fc3f7" text-anchor="middle">Quantum Kernel / VQC</text>
+
+                        <circle cx="305" cy="145" r="50" fill="rgba(255, 255, 255, 0.1)" stroke="#333" stroke-width="1"/>
+                        <line x1="305" y1="145" x2="340" y2="110" stroke="#f44336" stroke-width="2"/>
+                        <line x1="305" y1="145" x2="270" y2="180" stroke="#f44336" stroke-width="2"/>
+                        <line x1="305" y1="145" x2="340" y2="180" stroke="#f44336" stroke-width="2"/>
+                        <line x1="305" y1="145" x2="285" y2="105" stroke="#f44336" stroke-width="2"/>
+                        <text x="305" y="150" font-family="Arial" font-size="10" fill="#333" text-anchor="middle">2ⁿ Dim</text>
+                        <text x="305" y="165" font-family="Arial" font-size="10" fill="#333" text-anchor="middle">Space</text>
+
+                        <text x="305" y="220" font-family="Arial" font-size="11" fill="#4fc3f7" text-anchor="middle">QAOA (Optimization)</text>
+                        <text x="305" y="235" font-family="Arial" font-size="11" fill="#4fc3f7" text-anchor="middle">VQE (Energy Min)</text>
+
+                        <line x1="430" y1="145" x2="470" y2="145" stroke="#333" stroke-width="2" marker-end="url(#arrowDark)"/>
+
+                        <rect x="480" y="110" width="90" height="70" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="10"/>
+                        <text x="525" y="140" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Optimized</text>
+                        <text x="525" y="160" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">Model</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q7">
+            <div class="question-header">
+                <span class="question-number">Q7</span>
+                <h2>Compare gate-based quantum machine learning and annealing-based machine learning. Discuss their strengths and limitations.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Introduction</h3>
+                <p>Quantum Machine Learning (QML) can be implemented using two distinct paradigms:</p>
+                <ul>
+                    <li><strong>Gate-Based QML:</strong> Uses the "Universal Gate Model" (IBM, Google) — analogous to digital logic circuits.</li>
+                    <li><strong>Annealing-Based QML:</strong> Uses "Quantum Annealing" (D-Wave) — analogous to finding the lowest point in an energy landscape.</li>
+                </ul>
+
+                <h3 class="section-title">Comparison Table</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Gate-Based QML</th>
+                                <th>Annealing-Based QML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Paradigm</strong></td>
+                                <td>Universal (any quantum algorithm)</td>
+                                <td>Specialized (optimization & sampling)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Control</strong></td>
+                                <td>Discrete gates in time steps</td>
+                                <td>Continuous Hamiltonian evolution</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hardware</strong></td>
+                                <td>~100s qubits, short coherence</td>
+                                <td>~5000+ qubits, sparse connectivity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ML Models</strong></td>
+                                <td>VQC, QNN, QSVM</td>
+                                <td>Boltzmann Machines, Clustering</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Output</strong></td>
+                                <td>Expectation values</td>
+                                <td>Ground state bitstring</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="section-title">Strengths and Limitations</h3>
+
+                <div class="info-box concept">
+                    <h4>Gate-Based QML</h4>
+                    <div class="grid-container">
+                        <div class="pro-box">
+                            <h5>✓ Strengths</h5>
+                            <ul>
+                                <li><strong>Universality:</strong> Can execute exponential speedup algorithms (HHL)</li>
+                                <li><strong>Richness:</strong> Complex interference patterns for feature mapping</li>
+                            </ul>
+                        </div>
+                        <div class="con-box">
+                            <h5>✗ Limitations</h5>
+                            <ul>
+                                <li><strong>NISQ Constraints:</strong> Limited by noise, gate fidelity, coherence</li>
+                                <li><strong>Barren Plateaus:</strong> Vanishing gradient problem</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box concept">
+                    <h4>Annealing-Based QML</h4>
+                    <div class="grid-container">
+                        <div class="pro-box">
+                            <h5>✓ Strengths</h5>
+                            <ul>
+                                <li><strong>Scale:</strong> Thousands of qubits for larger problems</li>
+                                <li><strong>Optimization Native:</strong> Efficient for energy-based models</li>
+                            </ul>
+                        </div>
+                        <div class="con-box">
+                            <h5>✗ Limitations</h5>
+                            <ul>
+                                <li><strong>Not Universal:</strong> Cannot run Shor's or Grover's</li>
+                                <li><strong>Precision:</strong> Analog errors limit solution quality</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">⚖️ Circuit vs. Landscape</p>
+                    <svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+                        <text x="150" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#4fc3f7" text-anchor="middle">Gate-Based QML</text>
+                        <rect x="40" y="50" width="220" height="220" fill="rgba(79, 195, 247, 0.1)" stroke="#4fc3f7" stroke-width="2" rx="15"/>
+
+                        <line x1="60" y1="100" x2="240" y2="100" stroke="#666" stroke-width="2"/>
+                        <line x1="60" y1="140" x2="240" y2="140" stroke="#666" stroke-width="2"/>
+                        <line x1="60" y1="180" x2="240" y2="180" stroke="#666" stroke-width="2"/>
+
+                        <rect x="90" y="85" width="40" height="110" fill="#ffecb3" stroke="#f9a825" stroke-width="2" rx="5"/>
+                        <text x="110" y="145" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">U</text>
+
+                        <rect x="150" y="85" width="30" height="30" fill="#fff" stroke="#333" stroke-width="2" rx="3"/>
+                        <text x="165" y="105" font-family="Arial" font-size="10" text-anchor="middle" fill="#333">Rx</text>
+
+                        <line x1="180" y1="140" x2="180" y2="180" stroke="#333" stroke-width="2"/>
+                        <circle cx="180" cy="140" r="5" fill="#333"/>
+                        <circle cx="180" cy="180" r="10" fill="none" stroke="#333" stroke-width="2"/>
+                        <line x1="170" y1="180" x2="190" y2="180" stroke="#333" stroke-width="2"/>
+
+                        <text x="150" y="250" font-family="Arial" font-size="12" fill="#4fc3f7" text-anchor="middle">Digital / Universal</text>
+
+                        <text x="450" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#ce93d8" text-anchor="middle">Annealing-Based QML</text>
+                        <rect x="340" y="50" width="220" height="220" fill="rgba(206, 147, 216, 0.1)" stroke="#ce93d8" stroke-width="2" rx="15"/>
+
+                        <path d="M 360 120 Q 400 250 450 180 Q 500 80 540 200" stroke="#ce93d8" stroke-width="3" fill="none"/>
+
+                        <circle cx="400" cy="180" r="10" fill="#ce93d8"/>
+                        <line x1="412" y1="175" x2="440" y2="175" stroke="#ce93d8" stroke-width="2" stroke-dasharray="4,4"/>
+
+                        <circle cx="540" cy="200" r="10" fill="none" stroke="#4caf50" stroke-width="2"/>
+                        <text x="540" y="225" font-family="Arial" font-size="10" fill="#4caf50" text-anchor="middle">Solution</text>
+
+                        <text x="450" y="250" font-family="Arial" font-size="12" fill="#ce93d8" text-anchor="middle">Analog / Optimization</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <article class="question-card" id="q8">
+            <div class="question-header">
+                <span class="question-number">Q8</span>
+                <h2>Describe future trends in quantum-AI integration. Discuss the role of NISQ devices and hybrid algorithms.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">Future Trends in Quantum-AI Integration</h3>
+                <p>The integration of Quantum Computing and AI is evolving from experiments to practical prototypes:</p>
+                <ul>
+                    <li><strong>Quantum Neural Networks (QNNs):</strong> Deep quantum networks capturing complex, non-linear relationships invisible to classical networks.</li>
+                    <li><strong>QRAM Development:</strong> Efficient Quantum Random Access Memory for logarithmically fast Big Data loading.</li>
+                    <li><strong>Generative Models:</strong> Quantum GANs for drug discovery and material science.</li>
+                    <li><strong>Cloud-Native Integration:</strong> QPUs integrated into ML pipelines (TensorFlow Quantum, PyTorch Quantum).</li>
+                </ul>
+
+                <h3 class="section-title">The Role of NISQ Devices</h3>
+                <p>We are in the <strong>NISQ (Noisy Intermediate-Scale Quantum)</strong> era.</p>
+
+                <div class="info-box concept">
+                    <h4>Definition</h4>
+                    <p>NISQ devices have 50–1000 qubits without error correction. Powerful enough to not be classically simulatable but too noisy for deep algorithms.</p>
+                </div>
+
+                <div class="info-box concept">
+                    <h4>Role in AI</h4>
+                    <ul>
+                        <li><strong>Heuristic Exploration:</strong> Testbeds for finding "Quantum Advantage" with short-depth circuits.</li>
+                        <li><strong>Noise as Feature:</strong> Noise may act as regularization (like dropout) preventing overfitting.</li>
+                        <li><strong>Benchmarking:</strong> Establishing hardware requirements for scaling AI applications.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">The Role of Hybrid Algorithms</h3>
+                <p>Since NISQ devices cannot run long algorithms, <strong>Hybrid Quantum-Classical Algorithms</strong> are the standard approach.</p>
+
+                <div class="info-box concept">
+                    <h4>Mechanism</h4>
+                    <ul>
+                        <li><strong>QPU:</strong> Handles the "hard" part — computing kernels or sampling from high-dimensional landscapes with short, shallow circuits.</li>
+                        <li><strong>CPU/GPU:</strong> Handles "management" — parameter optimization, summing results, controlling the loop.</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Importance:</strong> Hybrid algorithms (VQE, QAOA, Variational Classifiers) are robust against noise because classical optimizers can compensate for systematic errors. They act as a bridge for deriving value from imperfect quantum computers today.
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">🗺️ Roadmap from NISQ to Fault Tolerance</p>
+                    <svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowW" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+                            </marker>
+                        </defs>
+
+                        <line x1="50" y1="270" x2="560" y2="270" stroke="#333" stroke-width="2" marker-end="url(#arrowW)"/>
+                        <text x="50" y="295" font-family="Arial" font-size="12" fill="#90a4ae">Time / Hardware Maturity</text>
+
+                        <rect x="60" y="50" width="150" height="200" fill="rgba(255, 167, 38, 0.2)" stroke="#ffa726" stroke-width="2" stroke-dasharray="5,5" rx="15"/>
+                        <text x="135" y="75" font-family="Arial" font-size="14" font-weight="bold" fill="#ffa726" text-anchor="middle">NISQ Era</text>
+                        <text x="135" y="95" font-family="Arial" font-size="11" fill="#ffa726" text-anchor="middle">(Current)</text>
+
+                        <text x="135" y="125" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Noisy Qubits</text>
+                        <text x="135" y="145" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Hybrid Algos</text>
+                        <text x="135" y="165" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• (VQE, QAOA)</text>
+                        <text x="135" y="185" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Proof of Concept</text>
+
+                        <path d="M 220 150 L 240 150" stroke="#333" stroke-width="2" marker-end="url(#arrowW)"/>
+
+                        <rect x="230" y="50" width="150" height="200" fill="rgba(66, 165, 245, 0.2)" stroke="#42a5f5" stroke-width="2" rx="15"/>
+                        <text x="305" y="75" font-family="Arial" font-size="14" font-weight="bold" fill="#42a5f5" text-anchor="middle">Early FT</text>
+                        <text x="305" y="95" font-family="Arial" font-size="11" fill="#42a5f5" text-anchor="middle">(Near Future)</text>
+
+                        <text x="305" y="125" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Error Mitigation</text>
+                        <text x="305" y="145" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Logical Qubits</text>
+                        <text x="305" y="165" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• QRAM Prototypes</text>
+                        <text x="305" y="185" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Chemistry Adv.</text>
+
+                        <path d="M 390 150 L 410 150" stroke="#333" stroke-width="2" marker-end="url(#arrowW)"/>
+
+                        <rect x="400" y="50" width="150" height="200" fill="rgba(102, 187, 106, 0.2)" stroke="#66bb6a" stroke-width="2" rx="15"/>
+                        <text x="475" y="75" font-family="Arial" font-size="14" font-weight="bold" fill="#66bb6a" text-anchor="middle">Full Scale</text>
+                        <text x="475" y="95" font-family="Arial" font-size="11" fill="#66bb6a" text-anchor="middle">(Long Term)</text>
+
+                        <text x="475" y="125" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Millions of Qubits</text>
+                        <text x="475" y="145" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Deep Circuits</text>
+                        <text x="475" y="165" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• Grover/Shor</text>
+                        <text x="475" y="185" font-family="Arial" font-size="11" fill="#333" text-anchor="middle">• True AI Speedup</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <p>© 2025 Quantum Computing Study Guide | Built for Learning</p>
+    </footer>
+
+    <button class="scroll-top" id="backToTop" aria-label="Back to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+        const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+        const html = document.documentElement;
+
+        // Check local storage
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', currentTheme);
+        updateIcons(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons(newTheme);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        // Back to top button functionality
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // KaTeX Configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>

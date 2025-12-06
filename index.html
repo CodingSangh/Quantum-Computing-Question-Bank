@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Computing Study Guide</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        :root {
+            /* Core Brand Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            /* Theme Variables (Default Dark) */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --table-head-bg: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Hero Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        header h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            color: white;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        /* Course Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding-bottom: 4rem;
+        }
+
+        /* Unit Cards */
+        .unit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .unit-tag {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .unit-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .card-body p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .topics-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .topics-list li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .topics-list li::before {
+            content: '•';
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .card-footer {
+            padding: 1.5rem;
+            background: var(--bg-card-hover);
+            border-top: 1px solid var(--border);
+            text-align: right;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateX(3px);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 200;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.4); }
+
+        footer {
+            background: var(--bg-card);
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            /* 1. Force all Tables to scroll horizontally */
+            table, .table-wrapper, .comparison-table {
+                display: block !important;       /* Makes table behave like a block to allow scrolling */
+                width: 100% !important;          /* Forces container to fit screen */
+                overflow-x: auto !important;     /* Adds horizontal scrollbar if content is too wide */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+            }
+
+            /* 2. Fix SVG Diagrams scaling */
+            .diagram-container {
+                padding: 10px !important;        /* Reduce padding to give diagrams more space */
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .diagram-container svg {
+                width: 100% !important;          /* Force SVG to fit container width */
+                height: auto !important;         /* Maintain aspect ratio */
+                max-width: 100%;                 /* Prevent overflowing */
+            }
+
+            /* 3. Prevent general page overflow */
+            body, main, .container {
+                overflow-x: hidden;              /* Stops the whole page from wiggling left/right */
+                width: 100%;
+            }
+
+            .theme-toggle {
+                position: fixed !important; /* Forces it to stay in place on screen */
+                top: 15px !important;       /* Distance from top edge */
+                right: 15px !important;     /* Distance from right edge */
+                z-index: 2000 !important;   /* Ensures it sits on top of all other content */
+                
+                /* Optional: Add a slight background/shadow so it's visible over text */
+                background: rgba(30, 41, 59, 0.8); /* Dark semi-transparent background */
+                backdrop-filter: blur(5px);        /* Blur effect for modern look */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            /* Adjust icon color for visibility on mixed backgrounds */
+            [data-theme="light"] .theme-toggle {
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid rgba(0,0,0,0.1);
+                color: #333;
+            }
+            
+            nav {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Quantum Computing Study Guide</h1>
+        <p>Master the principles of quantum mechanics, algorithms, hardware, and machine learning.</p>
+        
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+            <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </header>
+
+    <main>
+        <div class="grid-container">
+
+            <article class="unit-card">
+                <div class="card-header">
+                    <span class="unit-tag">Unit 1</span>
+                    <h2>Foundations</h2>
+                </div>
+                <div class="card-body">
+                    <p>Understanding the mathematical postulates and physical principles that govern quantum systems.</p>
+                    <ul class="topics-list">
+                        <li>Postulates of Quantum Mechanics</li>
+                        <li>Qubits & Dirac Notation</li>
+                        <li>Measurement Theory</li>
+                        <li>Vector Spaces & Tensor Products</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="unit1.html" class="btn">Start Unit 1 →</a>
+                </div>
+            </article>
+
+            <article class="unit-card">
+                <div class="card-header">
+                    <span class="unit-tag">Unit 2</span>
+                    <h2>Gates & Circuits</h2>
+                </div>
+                <div class="card-body">
+                    <p>Dive into the building blocks of quantum computation: logic gates and circuit construction.</p>
+                    <ul class="topics-list">
+                        <li>Single & Multi-Qubit Gates</li>
+                        <li>Entanglement Circuits</li>
+                        <li>No-Cloning Theorem</li>
+                        <li>Bloch Sphere Rotations</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="unit2.html" class="btn">Start Unit 2 →</a>
+                </div>
+            </article>
+
+            <article class="unit-card">
+                <div class="card-header">
+                    <span class="unit-tag">Unit 3</span>
+                    <h2>Algorithms</h2>
+                </div>
+                <div class="card-body">
+                    <p>Explore the famous algorithms that demonstrate quantum advantage over classical computers.</p>
+                    <ul class="topics-list">
+                        <li>Deutsch-Jozsa & Bernstein-Vazirani</li>
+                        <li>Grover's Search Algorithm</li>
+                        <li>Quantum Fourier Transform (QFT)</li>
+                        <li>Shor's Factoring Algorithm</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="unit3.html" class="btn">Start Unit 3 →</a>
+                </div>
+            </article>
+
+            <article class="unit-card">
+                <div class="card-header">
+                    <span class="unit-tag">Unit 4</span>
+                    <h2>Hardware & Errors</h2>
+                </div>
+                <div class="card-body">
+                    <p>Learn about physical realizations of qubits and how we handle noise in quantum systems.</p>
+                    <ul class="topics-list">
+                        <li>Quantum Noise & Decoherence</li>
+                        <li>Error Correction Codes (Shor, Steane)</li>
+                        <li>Fault Tolerance</li>
+                        <li>Superconducting & Ion-Trap Qubits</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="unit4.html" class="btn">Start Unit 4 →</a>
+                </div>
+            </article>
+
+            <article class="unit-card">
+                <div class="card-header">
+                    <span class="unit-tag">Unit 5</span>
+                    <h2>Quantum ML</h2>
+                </div>
+                <div class="card-body">
+                    <p>The cutting edge intersection of AI and Quantum Computing.</p>
+                    <ul class="topics-list">
+                        <li>Data Encoding Methods</li>
+                        <li>Variational Quantum Circuits (VQC)</li>
+                        <li>Quantum Support Vector Machines</li>
+                        <li>Quantum Annealing</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="unit5.html" class="btn">Start Unit 5 →</a>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Quantum Computing Study Guide | Built for Learning</p>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+        const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+        const html = document.documentElement;
+
+        // Check local storage
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', currentTheme);
+        updateIcons(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons(newTheme);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

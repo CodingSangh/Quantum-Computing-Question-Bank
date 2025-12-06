@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 3: Quantum Computing Algorithms</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            /* Core Brand Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            /* Theme Variables (Default Dark) */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --code-bg: #0d1117;
+            --math-bg: rgba(99, 102, 241, 0.1);
+            --gate-bg: rgba(99, 102, 241, 0.05);
+            --table-head-bg: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --table-row-even: rgba(99, 102, 241, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --math-bg: rgba(99, 102, 241, 0.05);
+            --gate-bg: rgba(99, 102, 241, 0.05);
+            --table-row-even: rgba(99, 102, 241, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 4rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-card);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 200;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.4); }
+
+        /* Main Layout */
+        main { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2); }
+
+        .question-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .question-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            color: white;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .question-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .answer-content { padding: 1.5rem; }
+
+        /* Typography & Components */
+        .section-title, h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+        
+        h4 {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem;
+        }
+
+        /* Info Boxes */
+        .info-box, .highlight-box {
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        /* Mapping old classes to new style logic */
+        .highlight-box { background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary); }
+        .highlight-box.success { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); }
+        .highlight-box.warning { background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning); }
+
+        /* Math Blocks */
+        .math-block {
+            background: var(--math-bg);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        /* Lists */
+        ul, ol { margin: 1rem 0; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; color: var(--text-secondary); }
+        li strong { color: var(--text-primary); }
+
+        /* Tables */
+        .table-wrapper, .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        th { background: var(--table-head-bg); color: white; padding: 1rem; text-align: left; font-weight: 600; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); background: var(--bg-card); }
+        tr:hover td { background: var(--table-row-even); }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .tag-quantum { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .tag-classical { background: rgba(236, 72, 153, 0.2); color: #ec4899; }
+
+        /* Diagrams */
+        .diagram-container {
+            background: white; /* Always white for visibility */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .diagram-container svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+        .diagram-title {
+            text-align: center;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-card);
+            text-align: center;
+            padding: 3rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Scroll Top */
+        .scroll-top {
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 1000;
+            color: white;
+        }
+        .scroll-top.visible { opacity: 1; visibility: visible; }
+
+        
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            /* 1. Force all Tables to scroll horizontally */
+            table, .table-wrapper, .comparison-table {
+                display: block !important;       /* Makes table behave like a block to allow scrolling */
+                width: 100% !important;          /* Forces container to fit screen */
+                overflow-x: auto !important;     /* Adds horizontal scrollbar if content is too wide */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+            }
+
+            /* 2. Fix SVG Diagrams scaling */
+            .diagram-container {
+                padding: 10px !important;        /* Reduce padding to give diagrams more space */
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            .diagram-container svg {
+                width: 100% !important;          /* Force SVG to fit container width */
+                height: auto !important;         /* Maintain aspect ratio */
+                max-width: 100%;                 /* Prevent overflowing */
+            }
+
+            /* 3. Prevent general page overflow */
+            body, main, .container {
+                overflow-x: hidden;              /* Stops the whole page from wiggling left/right */
+                width: 100%;
+            }
+
+            .theme-toggle {
+                position: fixed !important; /* Forces it to stay in place on screen */
+                top: 15px !important;       /* Distance from top edge */
+                right: 15px !important;     /* Distance from right edge */
+                z-index: 2000 !important;   /* Ensures it sits on top of all other content */
+                
+                /* Optional: Add a slight background/shadow so it's visible over text */
+                background: rgba(30, 41, 59, 0.8); /* Dark semi-transparent background */
+                backdrop-filter: blur(5px);        /* Blur effect for modern look */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            /* Adjust icon color for visibility on mixed backgrounds */
+            [data-theme="light"] .theme-toggle {
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid rgba(0,0,0,0.1);
+                color: #333;
+            }
+            
+            nav {
+                position: relative;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚛️ Quantum Computing</h1>
+        <p>Error Correction, Hardware & Advanced Concepts</p>
+
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+            <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#q1">Quantum Noise</a></li>
+            <li><a href="#q2">QEC Principles</a></li>
+            <li><a href="#q3">Bit/Phase Flip</a></li>
+            <li><a href="#q4">Shor Code</a></li>
+            <li><a href="#q5">Fault Tolerance</a></li>
+            <li><a href="#q6">Qubit Types</a></li>
+            <li><a href="#q7">Scaling Challenges</a></li>
+            <li><a href="#q8">Stabilizer Formalism</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Question 1 -->
+        <article class="question-card" id="q1">
+            <div class="question-header">
+                <span class="question-number">1</span>
+                <h2>Explain quantum noise and decoherence. Discuss how different noise models (phase damping, amplitude damping, depolarizing) affect qubits.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. Quantum Noise and Decoherence</h3>
+                
+                <div class="info-box concept">
+                    <p><strong>Quantum Noise:</strong> In an ideal world, quantum systems are isolated. In reality, qubits interact with their external environment (heat, electromagnetic fields, etc.). These unwanted interactions are collectively called <strong>Quantum Noise</strong>. This noise introduces errors into calculations, making the qubit's evolution non-unitary (irreversible) from the perspective of the qubit alone.</p>
+                </div>
+
+                <div class="info-box important">
+                    <p><strong>Decoherence:</strong> This is the specific process by which a quantum system loses its quantum properties (superposition and entanglement) due to entanglement with the environment.</p>
+                    <ul>
+                        <li>Mathematically, if a qubit is in a superposition $\alpha|0\rangle + \beta|1\rangle$, decoherence causes the "off-diagonal" terms in its density matrix (the phase relations) to decay to zero.</li>
+                        <li>The state transitions from a <strong>pure quantum state</strong> (superposition) to a <strong>mixed classical state</strong> (probabilistic mixture).</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">2. Noise Models</h3>
+                <p>We model these errors using "Quantum Channels" acting on the Density Matrix $\rho$.</p>
+
+                <h4 class="subsection-title">A. Phase Damping (Dephasing / T₂ Relaxation)</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> This noise describes the loss of quantum phase information without the loss of energy. It is caused by random fluctuations in the qubit's frequency.</li>
+                    <li><strong>Effect on Qubit:</strong>
+                        <ul>
+                            <li>The relative phase between $|0\rangle$ and $|1\rangle$ gets scrambled.</li>
+                            <li>The state $\frac{|0\rangle + |1\rangle}{\sqrt{2}}$ eventually becomes a classical mixture of 50% $|0\rangle$ and 50% $|1\rangle$.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Bloch Sphere:</strong> The Bloch vector shrinks towards the Z-axis (latitude is preserved, but the vector length decreases).</li>
+                </ul>
+
+                <h4 class="subsection-title">B. Amplitude Damping (Energy Relaxation / T₁ Relaxation)</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> This models the loss of energy from a quantum system to its environment (e.g., an atom spontaneously emitting a photon).</li>
+                    <li><strong>Effect on Qubit:</strong>
+                        <ul>
+                            <li>It causes the state $|1\rangle$ (excited state) to decay into the state $|0\rangle$ (ground state).</li>
+                            <li>Unlike phase damping, this affects the population of the states.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Bloch Sphere:</strong> The entire Bloch sphere shrinks towards the North Pole ($|0\rangle$).</li>
+                </ul>
+
+                <h4 class="subsection-title">C. Depolarizing Channel</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> This describes a "worst-case" scenario where the qubit is scrambled completely randomly. With probability $p$, an error occurs; with probability $1-p$, the qubit remains safe.</li>
+                    <li><strong>Effect on Qubit:</strong> The error could be a bit-flip ($X$), a phase-flip ($Z$), or both ($Y$).</li>
+                </ul>
+                <div class="math-block">
+                    $$\mathcal{E}(\rho) = (1-p)\rho + \frac{p}{3}(X\rho X + Y\rho Y + Z\rho Z)$$
+                </div>
+                <p>Eventually, the state becomes the "maximally mixed state" ($I/2$), sitting at the exact center of the Bloch sphere (total uncertainty).</p>
+                <ul>
+                    <li><strong>Bloch Sphere:</strong> The Bloch sphere shrinks uniformly from all directions towards the center.</li>
+                </ul>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Visualizing Noise on the Bloch Sphere</p>
+                    <svg width="600" height="250" viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#e53935" />
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+                        
+                        <!-- Phase Damping -->
+                        <g transform="translate(100, 125)">
+                            <text x="0" y="-85" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">Phase Damping</text>
+                            <circle cx="0" cy="0" r="60" stroke="#cbd5e1" fill="none" stroke-dasharray="3,3" stroke-width="1.5"/>
+                            <line x1="0" y1="-60" x2="0" y2="60" stroke="#475569" stroke-width="2"/>
+                            <text x="5" y="-65" font-family="Arial" font-size="10" fill="#475569">|0⟩</text>
+                            <text x="5" y="70" font-family="Arial" font-size="10" fill="#475569">|1⟩</text>
+                            <ellipse cx="0" cy="0" rx="40" ry="12" stroke="#e53935" fill="rgba(229,57,53,0.1)" stroke-width="2"/>
+                            <ellipse cx="0" cy="0" rx="20" ry="6" stroke="#e53935" fill="rgba(229,57,53,0.2)" stroke-width="2"/>
+                            <text x="0" y="85" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">Preserves Z (Energy)</text>
+                        </g>
+
+                        <!-- Amplitude Damping -->
+                        <g transform="translate(300, 125)">
+                            <text x="0" y="-85" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">Amplitude Damping</text>
+                            <circle cx="0" cy="0" r="60" stroke="#cbd5e1" fill="none" stroke-dasharray="3,3" stroke-width="1.5"/>
+                            <line x1="0" y1="-60" x2="0" y2="60" stroke="#475569" stroke-width="2"/>
+                            <text x="5" y="-65" font-family="Arial" font-size="10" fill="#475569">|0⟩</text>
+                            <text x="5" y="70" font-family="Arial" font-size="10" fill="#475569">|1⟩</text>
+                            <circle cx="0" cy="-25" r="30" stroke="#e53935" fill="rgba(229,57,53,0.1)" stroke-width="2"/>
+                            <circle cx="0" cy="-40" r="15" stroke="#e53935" fill="rgba(229,57,53,0.2)" stroke-width="2"/>
+                            <path d="M 0 40 L 0 5" stroke="#e53935" stroke-width="2" marker-end="url(#arrow1)"/>
+                            <text x="0" y="85" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">Decays to |0⟩</text>
+                        </g>
+
+                        <!-- Depolarizing -->
+                        <g transform="translate(500, 125)">
+                            <text x="0" y="-85" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">Depolarizing</text>
+                            <circle cx="0" cy="0" r="60" stroke="#cbd5e1" fill="none" stroke-dasharray="3,3" stroke-width="1.5"/>
+                            <circle cx="0" cy="0" r="30" stroke="#e53935" fill="rgba(229,57,53,0.1)" stroke-width="2"/>
+                            <circle cx="0" cy="0" r="10" stroke="#e53935" fill="rgba(229,57,53,0.3)" stroke-width="2"/>
+                            <line x1="-55" y1="0" x2="-35" y2="0" stroke="#e53935" stroke-width="2" marker-end="url(#arrow1)"/>
+                            <line x1="55" y1="0" x2="35" y2="0" stroke="#e53935" stroke-width="2" marker-end="url(#arrow1)"/>
+                            <line x1="0" y1="-55" x2="0" y2="-35" stroke="#e53935" stroke-width="2" marker-end="url(#arrow1)"/>
+                            <line x1="0" y1="55" x2="0" y2="35" stroke="#e53935" stroke-width="2" marker-end="url(#arrow1)"/>
+                            <text x="0" y="85" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">Shrinks to Center</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 2 -->
+        <article class="question-card" id="q2">
+            <div class="question-header">
+                <span class="question-number">2</span>
+                <h2>Describe the need for quantum error correction (QEC). Explain the principles of syndrome measurement and recovery.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. The Need for Quantum Error Correction (QEC)</h3>
+                <p>Unlike classical computers, which are robust against noise, quantum computers are incredibly fragile. QEC is necessary due to several fundamental challenges:</p>
+                
+                <ul>
+                    <li><strong>Decoherence:</strong> Quantum information is stored in delicate superpositions. Interaction with the environment (heat, radiation) causes the state to "leak" or collapse into a classical state, destroying the computation.</li>
+                    <li><strong>The No-Cloning Theorem:</strong> We cannot simply copy a qubit to create backup redundancy (like classical RAID or repetition codes), because $U|\psi\rangle|0\rangle \neq |\psi\rangle|\psi\rangle$.</li>
+                    <li><strong>Continuous Errors:</strong> Classical errors are discrete (0 flips to 1). Quantum errors can be continuous (e.g., a rotation by $0.001°$). QEC must be able to digitize and correct these continuous errors.</li>
+                    <li><strong>Measurement Destroys Information:</strong> We cannot check for errors by measuring the data qubits directly, as this would collapse the superposition we are trying to protect.</li>
+                </ul>
+
+                <h3 class="section-title">2. Principle 1: Syndrome Measurement</h3>
+                <p>Since we cannot measure the data qubits directly, we use <strong>Ancilla Qubits</strong> (auxiliary qubits) to diagnose the system.</p>
+                
+                <ul>
+                    <li><strong>Indirect Measurement:</strong> We entangle the Data Qubits with Ancilla Qubits using CNOT gates.</li>
+                    <li><strong>Parity Check:</strong> The circuit is designed to measure the "parity" of the data qubits (relationships between them) rather than their individual values.</li>
+                    <li><strong>The Syndrome:</strong> We measure the Ancilla Qubits. The result of this measurement is called the <strong>Error Syndrome</strong>.
+                        <div class="info-box success">
+                            <strong>Property:</strong> The syndrome reveals <em>which</em> error occurred (if any) but reveals <em>nothing</em> about the actual state of the data. This allows the superposition to survive the measurement.
+                        </div>
+                    </li>
+                </ul>
+
+                <h3 class="section-title">3. Principle 2: Recovery</h3>
+                <p>Once the syndrome is obtained, we apply a <strong>Recovery Operation</strong> to restore the state.</p>
+                
+                <ul>
+                    <li><strong>Mapping:</strong> There is a specific mapping between Syndromes and Errors.
+                        <ul>
+                            <li><em>Example:</em> In a 3-qubit code, a syndrome of <code>00</code> might mean "No Error," while <code>01</code> might mean "Bit flip on Qubit 1."</li>
+                        </ul>
+                    </li>
+                    <li><strong>Correction:</strong> Based on the classical syndrome bits, we apply a specific unitary gate (usually a Pauli-X for bit flips or Pauli-Z for phase flips) to the affected data qubit.</li>
+                    <li><strong>Reversibility:</strong> Since quantum errors are unitary transformations (e.g., $X$ gate applied by noise), the recovery operation is simply the inverse unitary gate (e.g., applying $X$ again, since $X^2=I$).</li>
+                </ul>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">The QEC Cycle</p>
+                    <svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
+                            </marker>
+                            <marker id="arrow2b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#7c3aed" />
+                            </marker>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+
+                        <!-- Input State -->
+                        <rect x="40" y="100" width="90" height="60" rx="8" fill="url(#grad1)"/>
+                        <text x="85" y="125" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="white">Quantum</text>
+                        <text x="85" y="143" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="white">State |ψ⟩</text>
+
+                        <!-- Arrow 1 -->
+                        <line x1="135" y1="130" x2="175" y2="130" stroke="#475569" stroke-width="2" marker-end="url(#arrow2)"/>
+
+                        <!-- Noise -->
+                        <path d="M 190 115 Q 205 95 220 115 T 250 115" stroke="#ef4444" stroke-width="3" fill="none"/>
+                        <text x="220" y="90" font-family="Arial" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">Noise / Error</text>
+
+                        <!-- Arrow 2 -->
+                        <line x1="260" y1="130" x2="300" y2="130" stroke="#475569" stroke-width="2" marker-end="url(#arrow2)"/>
+
+                        <!-- Syndrome Measurement -->
+                        <rect x="305" y="80" width="130" height="100" rx="8" fill="url(#grad2)"/>
+                        <text x="370" y="115" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="white">Syndrome</text>
+                        <text x="370" y="133" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="white">Measurement</text>
+                        <text x="370" y="155" font-family="Arial" font-size="11" text-anchor="middle" fill="rgba(255,255,255,0.9)">(Using Ancilla)</text>
+
+                        <!-- Arrow down -->
+                        <line x1="370" y1="185" x2="370" y2="215" stroke="#475569" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow2)"/>
+                        <text x="420" y="205" font-family="Arial" font-size="11" fill="#3b82f6" font-weight="500">Syndrome Bits</text>
+
+                        <!-- Recovery -->
+                        <rect x="305" y="220" width="130" height="50" rx="8" fill="url(#grad3)"/>
+                        <text x="370" y="250" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="white">Recovery (X/Z)</text>
+
+                        <!-- Correction arrow -->
+                        <path d="M 305 245 Q 270 245 270 200 L 270 155" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#arrow2b)"/>
+                        <text x="245" y="200" font-family="Arial" font-size="11" fill="#7c3aed" font-weight="500">Correction</text>
+
+                        <!-- Arrow 3 -->
+                        <line x1="440" y1="130" x2="480" y2="130" stroke="#475569" stroke-width="2" marker-end="url(#arrow2)"/>
+
+                        <!-- Output State -->
+                        <rect x="485" y="100" width="80" height="60" rx="8" fill="url(#grad4)"/>
+                        <text x="525" y="135" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="white">|ψ⟩</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 3 -->
+        <article class="question-card" id="q3">
+            <div class="question-header">
+                <span class="question-number">3</span>
+                <h2>Explain the bit-flip and phase-flip error correction codes with circuit diagrams.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. The 3-Qubit Bit-Flip Code</h3>
+                
+                <ul>
+                    <li><strong>Problem:</strong> A bit-flip error occurs when a qubit's state flips from $|0\rangle$ to $|1\rangle$ (or vice versa), equivalent to applying a Pauli-X gate.</li>
+                    <li><strong>Encoding (Redundancy):</strong> To protect a single logical qubit $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$, we encode it into three physical qubits using a <strong>Repetition Code</strong>.
+                        <ul>
+                            <li>Logical Zero: $|0_L\rangle = |000\rangle$</li>
+                            <li>Logical One: $|1_L\rangle = |111\rangle$</li>
+                            <li>Encoded State: $\alpha|000\rangle + \beta|111\rangle$</li>
+                        </ul>
+                    </li>
+                    <li><strong>Syndrome Measurement:</strong> We compare the values of the qubits without measuring them directly. We check the parity of neighbors ($q_1 \oplus q_2$ and $q_2 \oplus q_3$) using ancilla qubits.</li>
+                </ul>
+
+                <div class="info-box concept">
+                    <strong>Correction (Majority Vote):</strong>
+                    <ul>
+                        <li>Syndrome <code>00</code>: No error.</li>
+                        <li>Syndrome <code>10</code> (1 & 2 differ): Error on $q_1$. Apply $X_1$.</li>
+                        <li>Syndrome <code>11</code> (1 & 2 differ, 2 & 3 differ): Error on $q_2$. Apply $X_2$.</li>
+                        <li>Syndrome <code>01</code> (2 & 3 differ): Error on $q_3$. Apply $X_3$.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">2. The 3-Qubit Phase-Flip Code</h3>
+                
+                <ul>
+                    <li><strong>Problem:</strong> A phase-flip error occurs when the relative phase changes sign ($|0\rangle + |1\rangle \to |0\rangle - |1\rangle$), equivalent to applying a Pauli-Z gate.</li>
+                    <li><strong>Key Insight:</strong> A Phase-Flip ($Z$) in the computational basis ($0/1$) acts exactly like a Bit-Flip ($X$) in the diagonal basis ($+/-$).</li>
+                </ul>
+                <div class="math-block">
+                    $$H Z H = X$$
+                </div>
+                <ul>
+                    <li><strong>Encoding:</strong> We use the same structure as the bit-flip code but wrap the error channel in <strong>Hadamard Gates</strong>.
+                        <ul>
+                            <li>Logical Zero: $|0_L\rangle = |+++\rangle$</li>
+                            <li>Logical One: $|1_L\rangle = |---\rangle$</li>
+                        </ul>
+                    </li>
+                    <li><strong>Mechanism:</strong>
+                        <ol>
+                            <li><strong>Encode:</strong> Copy the bit to 3 qubits (CNOTs), then apply Hadamard ($H$) to all three.</li>
+                            <li><strong>Error:</strong> A $Z$ error occurs on one qubit.</li>
+                            <li><strong>Decode:</strong> Apply Hadamard ($H$) to all three. This converts the $Z$ error back into an $X$ error ($HZH=X$).</li>
+                            <li><strong>Correct:</strong> Use the standard bit-flip recovery to fix the now-converted bit flip.</li>
+                        </ol>
+                    </li>
+                </ul>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Bit-Flip and Phase-Flip Circuits</p>
+                    <svg width="600" height="420" viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6" />
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+                        
+                        <!-- Bit-Flip Code -->
+                        <text x="30" y="30" font-family="Arial" font-size="16" font-weight="bold" fill="#3b82f6">A. 3-Qubit Bit-Flip Code</text>
+                        
+                        <!-- Qubit lines -->
+                        <line x1="50" y1="60" x2="550" y2="60" stroke="#1e293b" stroke-width="2"/>
+                        <text x="25" y="65" font-family="Arial" font-size="13" fill="#475569">q₀</text>
+                        <line x1="50" y1="100" x2="550" y2="100" stroke="#1e293b" stroke-width="2"/>
+                        <text x="25" y="105" font-family="Arial" font-size="13" fill="#475569">q₁</text>
+                        <line x1="50" y1="140" x2="550" y2="140" stroke="#1e293b" stroke-width="2"/>
+                        <text x="25" y="145" font-family="Arial" font-size="13" fill="#475569">q₂</text>
+
+                        <!-- CNOT 1 -->
+                        <line x1="100" y1="60" x2="100" y2="100" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="100" cy="60" r="5" fill="#1e293b"/>
+                        <circle cx="100" cy="100" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="100" y1="88" x2="100" y2="112" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="88" y1="100" x2="112" y2="100" stroke="#1e293b" stroke-width="2"/>
+
+                        <!-- CNOT 2 -->
+                        <line x1="140" y1="60" x2="140" y2="140" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="140" cy="60" r="5" fill="#1e293b"/>
+                        <circle cx="140" cy="140" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="140" y1="128" x2="140" y2="152" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="128" y1="140" x2="152" y2="140" stroke="#1e293b" stroke-width="2"/>
+
+                        <text x="120" y="170" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">Encoding</text>
+
+                        <!-- Noise region -->
+                        <rect x="180" y="45" width="90" height="115" rx="6" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-dasharray="4,4"/>
+                        <text x="225" y="105" font-family="Arial" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">Noise (X)</text>
+
+                        <!-- Syndrome region -->
+                        <rect x="300" y="45" width="120" height="115" rx="6" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="2"/>
+                        <text x="360" y="95" font-family="Arial" font-size="12" fill="#059669" text-anchor="middle" font-weight="bold">Syndrome &</text>
+                        <text x="360" y="115" font-family="Arial" font-size="12" fill="#059669" text-anchor="middle" font-weight="bold">Recovery</text>
+
+                        <text x="490" y="105" font-family="Arial" font-size="13" fill="#10b981" font-weight="bold">|ψ⟩ (Clean)</text>
+
+                        <!-- Phase-Flip Code -->
+                        <text x="30" y="220" font-family="Arial" font-size="16" font-weight="bold" fill="#3b82f6">B. 3-Qubit Phase-Flip Code</text>
+                        
+                        <!-- Qubit lines -->
+                        <line x1="50" y1="260" x2="550" y2="260" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="50" y1="300" x2="550" y2="300" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="50" y1="340" x2="550" y2="340" stroke="#1e293b" stroke-width="2"/>
+
+                        <!-- CNOT gates -->
+                        <line x1="80" y1="260" x2="80" y2="300" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="80" cy="260" r="4" fill="#1e293b"/>
+                        <circle cx="80" cy="300" r="10" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="80" y1="290" x2="80" y2="310" stroke="#1e293b" stroke-width="1.5"/>
+                        <line x1="70" y1="300" x2="90" y2="300" stroke="#1e293b" stroke-width="1.5"/>
+
+                        <line x1="100" y1="260" x2="100" y2="340" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="100" cy="260" r="4" fill="#1e293b"/>
+                        <circle cx="100" cy="340" r="10" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="100" y1="330" x2="100" y2="350" stroke="#1e293b" stroke-width="1.5"/>
+                        <line x1="90" y1="340" x2="110" y2="340" stroke="#1e293b" stroke-width="1.5"/>
+
+                        <!-- Hadamard gates before noise -->
+                        <rect x="125" y="250" width="25" height="20" rx="3" fill="#06b6d4" stroke="#0891b2"/>
+                        <text x="137" y="264" font-family="Arial" font-size="11" text-anchor="middle" fill="white" font-weight="bold">H</text>
+                        <rect x="125" y="290" width="25" height="20" rx="3" fill="#06b6d4" stroke="#0891b2"/>
+                        <text x="137" y="304" font-family="Arial" font-size="11" text-anchor="middle" fill="white" font-weight="bold">H</text>
+                        <rect x="125" y="330" width="25" height="20" rx="3" fill="#06b6d4" stroke="#0891b2"/>
+                        <text x="137" y="344" font-family="Arial" font-size="11" text-anchor="middle" fill="white" font-weight="bold">H</text>
+
+                        <!-- Phase noise region -->
+                        <rect x="180" y="245" width="90" height="115" rx="6" fill="rgba(139,92,246,0.1)" stroke="#8b5cf6" stroke-dasharray="4,4"/>
+                        <text x="225" y="305" font-family="Arial" font-size="12" fill="#7c3aed" text-anchor="middle" font-weight="bold">Noise (Z)</text>
+
+                        <!-- Hadamard gates after noise -->
+                        <rect x="295" y="250" width="25" height="20" rx="3" fill="#06b6d4" stroke="#0891b2"/>
+                        <text x="307" y="264" font-family="Arial" font-size="11" text-anchor="middle" fill="white" font-weight="bold">H</text>
+                        <rect x="295" y="290" width="25" height="20" rx="3" fill="#06b6d4" stroke="#0891b2"/>
+                        <text x="307" y="304" font-family="Arial" font-size="11" text-anchor="middle" fill="white" font-weight="bold">H</text>
+                        <rect x="295" y="330" width="25" height="20" rx="3" fill="#06b6d4" stroke="#0891b2"/>
+                        <text x="307" y="344" font-family="Arial" font-size="11" text-anchor="middle" fill="white" font-weight="bold">H</text>
+
+                        <!-- Correction region -->
+                        <rect x="350" y="245" width="100" height="115" rx="6" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="2"/>
+                        <text x="400" y="295" font-family="Arial" font-size="11" fill="#059669" text-anchor="middle" font-weight="bold">Bit-Flip</text>
+                        <text x="400" y="315" font-family="Arial" font-size="11" fill="#059669" text-anchor="middle" font-weight="bold">Correction</text>
+
+                        <!-- Annotation -->
+                        <text x="225" y="385" font-family="Arial" font-size="12" fill="#3b82f6" text-anchor="middle" font-weight="bold">Z becomes X here ↑</text>
+                        <path d="M 307 375 L 307 355" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow3)"/>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 4 -->
+        <article class="question-card" id="q4">
+            <div class="question-header">
+                <span class="question-number">4</span>
+                <h2>Discuss the 9-qubit Shor code in detail. Explain how it corrects both bit-flip and phase-flip errors.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. Introduction to the Shor Code</h3>
+                <p>The 9-qubit Shor code is the first quantum error-correcting code discovered by Peter Shor. It is significant because it proved that quantum error correction is possible, correcting <strong>arbitrary single-qubit errors</strong>.</p>
+                
+                <div class="info-box concept">
+                    <p><strong>Key Concept:</strong> It uses <strong>concatenation</strong> (nesting) of two simpler codes:</p>
+                    <ol>
+                        <li>The 3-qubit <strong>Phase-Flip</strong> code (Outer layer).</li>
+                        <li>The 3-qubit <strong>Bit-Flip</strong> code (Inner layer).</li>
+                    </ol>
+                    <p><strong>Capacity:</strong> It encodes 1 logical qubit into 9 physical qubits and can correct any single error (Bit-Flip $X$, Phase-Flip $Z$, or both $Y$) on any one of the 9 qubits.</p>
+                </div>
+
+                <h3 class="section-title">2. Encoding Process (Concatenation)</h3>
+                
+                <h4 class="subsection-title">Step 1: Phase-Flip Encoding (Outer Layer)</h4>
+                <p>The single logical qubit $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ is first encoded using the 3-qubit phase-flip code:</p>
+                <div class="math-block">
+                    $$|0\rangle \to |+++\rangle, \quad |1\rangle \to |---\rangle$$
+                </div>
+                <p>State: $\alpha|+++\rangle + \beta|---\rangle$</p>
+
+                <h4 class="subsection-title">Step 2: Bit-Flip Encoding (Inner Layer)</h4>
+                <p>Each of the 3 qubits from Step 1 is further encoded into 3 qubits using the bit-flip code.</p>
+                <ul>
+                    <li>Recalling $|+\rangle = \frac{|0\rangle+|1\rangle}{\sqrt{2}}$, we map this to $\frac{|000\rangle+|111\rangle}{\sqrt{2}}$.</li>
+                    <li>Recalling $|-\rangle = \frac{|0\rangle-|1\rangle}{\sqrt{2}}$, we map this to $\frac{|000\rangle-|111\rangle}{\sqrt{2}}$.</li>
+                </ul>
+
+                <h4 class="subsection-title">Final Logical States:</h4>
+                <div class="math-block">
+                    $$|0_L\rangle = \frac{(|000\rangle + |111\rangle)(|000\rangle + |111\rangle)(|000\rangle + |111\rangle)}{2\sqrt{2}}$$
+                    $$|1_L\rangle = \frac{(|000\rangle - |111\rangle)(|000\rangle - |111\rangle)(|000\rangle - |111\rangle)}{2\sqrt{2}}$$
+                </div>
+
+                <h3 class="section-title">3. Correcting Bit-Flip Errors (X)</h3>
+                <ul>
+                    <li><strong>Scenario:</strong> Suppose a bit-flip error ($X$) occurs on the 1st qubit of the first block.</li>
+                    <li><strong>Detection:</strong> Syndrome measurement is performed <strong>independently within each block</strong>.
+                        <ul>
+                            <li>Block 1: Detects the mismatch in the first qubit.</li>
+                            <li>Block 2 & 3: No error detected.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Correction:</strong> Standard bit-flip recovery (applying $X$) is used on the identified qubit.</li>
+                </ul>
+
+                <h3 class="section-title">4. Correcting Phase-Flip Errors (Z)</h3>
+                <ul>
+                    <li><strong>Scenario:</strong> A phase-flip error ($Z$) occurs on a qubit.</li>
+                    <li><strong>Effect:</strong> $Z_1(|000\rangle + |111\rangle) = (|000\rangle - |111\rangle)$ — flips the "sign" of the entire block.</li>
+                    <li><strong>Detection:</strong> Compare the <strong>signs of the blocks</strong> (Block 1 vs 2, Block 2 vs 3).</li>
+                    <li><strong>Correction:</strong> Apply a phase correction ($Z$) to restore the sign.</li>
+                </ul>
+
+                <h3 class="section-title">5. Correcting Combined Errors (Y)</h3>
+                <p>Since $Y = iXZ$, a $Y$ error is just a simultaneous bit-flip and phase-flip. Both syndromes are detected and corrected sequentially.</p>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Hierarchy of the 9-Qubit Shor Code</p>
+                    <svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#06b6d4"/>
+                                <stop offset="100%" style="stop-color:#0891b2"/>
+                            </linearGradient>
+                            <linearGradient id="grad6" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f59e0b"/>
+                                <stop offset="100%" style="stop-color:#d97706"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+
+                        <!-- Logical Qubit -->
+                        <rect x="240" y="15" width="120" height="40" rx="8" fill="url(#grad5)"/>
+                        <text x="300" y="42" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="white">1 Logical Qubit</text>
+
+                        <!-- Lines to blocks -->
+                        <line x1="300" y1="55" x2="100" y2="95" stroke="#64748b" stroke-width="2"/>
+                        <line x1="300" y1="55" x2="300" y2="95" stroke="#64748b" stroke-width="2"/>
+                        <line x1="300" y1="55" x2="500" y2="95" stroke="#64748b" stroke-width="2"/>
+
+                        <text x="300" y="82" font-family="Arial" font-size="11" fill="#3b82f6" text-anchor="middle" font-weight="bold">Phase-Flip Encoding (Outer)</text>
+
+                        <!-- Blocks -->
+                        <rect x="40" y="100" width="120" height="40" rx="6" fill="url(#grad6)"/>
+                        <text x="100" y="125" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Block 1 (+/-)</text>
+
+                        <rect x="240" y="100" width="120" height="40" rx="6" fill="url(#grad6)"/>
+                        <text x="300" y="125" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Block 2 (+/-)</text>
+
+                        <rect x="440" y="100" width="120" height="40" rx="6" fill="url(#grad6)"/>
+                        <text x="500" y="125" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Block 3 (+/-)</text>
+
+                        <!-- Lines to physical qubits -->
+                        <line x1="100" y1="145" x2="60" y2="180" stroke="#64748b" stroke-width="1.5"/>
+                        <line x1="100" y1="145" x2="100" y2="180" stroke="#64748b" stroke-width="1.5"/>
+                        <line x1="100" y1="145" x2="140" y2="180" stroke="#64748b" stroke-width="1.5"/>
+
+                        <line x1="300" y1="145" x2="260" y2="180" stroke="#64748b" stroke-width="1.5"/>
+                        <line x1="300" y1="145" x2="300" y2="180" stroke="#64748b" stroke-width="1.5"/>
+                        <line x1="300" y1="145" x2="340" y2="180" stroke="#64748b" stroke-width="1.5"/>
+
+                        <line x1="500" y1="145" x2="460" y2="180" stroke="#64748b" stroke-width="1.5"/>
+                        <line x1="500" y1="145" x2="500" y2="180" stroke="#64748b" stroke-width="1.5"/>
+                        <line x1="500" y1="145" x2="540" y2="180" stroke="#64748b" stroke-width="1.5"/>
+
+                        <text x="300" y="170" font-family="Arial" font-size="11" fill="#10b981" text-anchor="middle" font-weight="bold">Bit-Flip Encoding (Inner)</text>
+
+                        <!-- Physical qubits -->
+                        <g fill="#10b981" stroke="#059669" stroke-width="2">
+                            <circle cx="60" cy="200" r="18"/><text x="60" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q1</text>
+                            <circle cx="100" cy="200" r="18"/><text x="100" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q2</text>
+                            <circle cx="140" cy="200" r="18"/><text x="140" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q3</text>
+
+                            <circle cx="260" cy="200" r="18"/><text x="260" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q4</text>
+                            <circle cx="300" cy="200" r="18"/><text x="300" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q5</text>
+                            <circle cx="340" cy="200" r="18"/><text x="340" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q6</text>
+
+                            <circle cx="460" cy="200" r="18"/><text x="460" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q7</text>
+                            <circle cx="500" cy="200" r="18"/><text x="500" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q8</text>
+                            <circle cx="540" cy="200" r="18"/><text x="540" y="205" font-size="11" stroke="none" text-anchor="middle" fill="white" font-weight="bold">q9</text>
+                        </g>
+
+                        <!-- Annotations -->
+                        <rect x="40" y="240" width="120" height="40" rx="6" fill="rgba(239,68,68,0.1)" stroke="#ef4444"/>
+                        <text x="100" y="258" font-family="Arial" font-size="10" fill="#ef4444" text-anchor="middle" font-weight="bold">X error here</text>
+                        <text x="100" y="272" font-family="Arial" font-size="10" fill="#ef4444" text-anchor="middle">Fixed by Block 1</text>
+
+                        <rect x="240" y="240" width="120" height="40" rx="6" fill="rgba(139,92,246,0.1)" stroke="#8b5cf6"/>
+                        <text x="300" y="258" font-family="Arial" font-size="10" fill="#7c3aed" text-anchor="middle" font-weight="bold">Z error here</text>
+                        <text x="300" y="272" font-family="Arial" font-size="10" fill="#7c3aed" text-anchor="middle">Fixed by Block Compare</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 5 -->
+        <article class="question-card" id="q5">
+            <div class="question-header">
+                <span class="question-number">5</span>
+                <h2>Explain fault-tolerant quantum computation. Discuss threshold theorems and fault-tolerant gate constructions.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. Fault-Tolerant Quantum Computation</h3>
+                <p>Fault-tolerant quantum computation is a method of performing reliable calculations using imperfect, noisy hardware. It involves encoding quantum information into <strong>logical qubits</strong> (using QEC codes) and performing operations directly on these encoded states.</p>
+                
+                <div class="info-box concept">
+                    <ul>
+                        <li><strong>Goal:</strong> Ensure that errors occurring in physical components (gates, measurements, idle qubits) do not propagate uncontrollably and corrupt the entire computation.</li>
+                        <li><strong>Principle:</strong> If an error occurs during a gate operation, it should be contained. A single failure should result in, at most, a single error in the encoded block, which the error correction code can detect and fix.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title">2. The Threshold Theorem</h3>
+                <p>The Quantum Threshold Theorem is a fundamental result that makes scalable quantum computing theoretically possible.</p>
+                
+                <div class="info-box important">
+                    <p><strong>Statement:</strong> There exists a critical physical error rate, $p_{th}$ (the <strong>threshold</strong>), such that if the error rate of individual physical components $p$ is below this threshold ($p < p_{th}$), then:</p>
+                    <ol>
+                        <li>We can concatenate error correcting codes.</li>
+                        <li>This reduces the logical error rate exponentially.</li>
+                        <li>We can perform arbitrarily long quantum computations with arbitrary accuracy.</li>
+                    </ol>
+                    <p><strong>Value:</strong> Typical estimates range from $10^{-5}$ to $10^{-2}$ (~1% for surface codes).</p>
+                </div>
+
+                <h3 class="section-title">3. Fault-Tolerant Gate Constructions</h3>
+
+                <h4 class="subsection-title">A. Transversal Gates (The Gold Standard)</h4>
+                <p>A gate is transversal if it interacts the $i$-th physical qubit of one logical block <em>only</em> with the $i$-th physical qubit of another logical block.</p>
+                <ul>
+                    <li><strong>Benefit:</strong> If an error occurs on the $i$-th qubit during the interaction, it stays on the $i$-th qubit. It does <strong>not</strong> spread to other qubits within the same logical block.</li>
+                    <li><em>Example:</em> A Logical CNOT implemented by applying 7 physical CNOTs pairwise between two 7-qubit Steane codes.</li>
+                </ul>
+
+                <h4 class="subsection-title">B. Ancilla Verification</h4>
+                <p>Measurement and error correction require "ancilla" qubits. If an ancilla is faulty, it could inject errors into the data. Fault-tolerant designs prepare and "verify" ancilla states to ensure they are clean before use.</p>
+
+                <h4 class="subsection-title">C. Magic State Distillation</h4>
+                <p>Some gates (like the T-gate) cannot be done transversally on many codes. We create "Magic States" offline, purify them using distillation protocols, and consume them to perform the gate fault-tolerantly via teleportation.</p>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Transversal CNOT vs Non-Transversal</p>
+                    <svg width="600" height="280" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L8,3 z" fill="#1e293b"/>
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+
+                        <!-- Bad Example -->
+                        <text x="125" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="#ef4444" text-anchor="middle">❌ Bad (Spreads Error)</text>
+
+                        <rect x="30" y="50" width="190" height="70" rx="8" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-dasharray="5,5"/>
+                        <text x="50" y="70" font-family="Arial" font-size="11" fill="#ef4444" font-weight="bold">Logical Block 1</text>
+                        <circle cx="70" cy="95" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="120" cy="95" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="170" cy="95" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+                        <rect x="30" y="140" width="190" height="70" rx="8" fill="rgba(6,182,212,0.1)" stroke="#06b6d4" stroke-dasharray="5,5"/>
+                        <text x="50" y="160" font-family="Arial" font-size="11" fill="#0891b2" font-weight="bold">Logical Block 2</text>
+                        <circle cx="70" cy="185" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="120" cy="185" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="170" cy="185" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+                        <!-- Error spreading -->
+                        <circle cx="70" cy="95" r="6" fill="#ef4444"/>
+                        <text x="35" y="115" font-family="Arial" font-size="9" fill="#ef4444">Error</text>
+
+                        <line x1="70" y1="107" x2="70" y2="173" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="70" y1="107" x2="120" y2="173" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="70" y1="107" x2="170" y2="173" stroke="#1e293b" stroke-width="2"/>
+
+                        <circle cx="70" cy="185" r="6" fill="#ef4444"/>
+                        <circle cx="120" cy="185" r="6" fill="#ef4444"/>
+                        <circle cx="170" cy="185" r="6" fill="#ef4444"/>
+
+                        <text x="125" y="240" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">Error spreads to multiple</text>
+                        <text x="125" y="255" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">qubits in Block 2</text>
+
+                        <!-- Good Example -->
+                        <text x="475" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="#10b981" text-anchor="middle">✓ Transversal (Fault Tolerant)</text>
+
+                        <rect x="380" y="50" width="190" height="70" rx="8" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-dasharray="5,5"/>
+                        <circle cx="420" cy="95" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="470" cy="95" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="520" cy="95" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+                        <rect x="380" y="140" width="190" height="70" rx="8" fill="rgba(6,182,212,0.1)" stroke="#06b6d4" stroke-dasharray="5,5"/>
+                        <circle cx="420" cy="185" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="470" cy="185" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="520" cy="185" r="12" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+                        <!-- Proper connections -->
+                        <line x1="420" y1="107" x2="420" y2="173" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="470" y1="107" x2="470" y2="173" stroke="#1e293b" stroke-width="2"/>
+                        <line x1="520" y1="107" x2="520" y2="173" stroke="#1e293b" stroke-width="2"/>
+
+                        <circle cx="420" cy="95" r="6" fill="#ef4444"/>
+                        <circle cx="420" cy="185" r="6" fill="#ef4444"/>
+
+                        <text x="475" y="240" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">Error affects only ONE</text>
+                        <text x="475" y="255" font-family="Arial" font-size="11" text-anchor="middle" fill="#64748b">qubit per block (Correctable)</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 6 -->
+        <article class="question-card" id="q6">
+            <div class="question-header">
+                <span class="question-number">6</span>
+                <h2>Compare physical realizations of qubits: superconducting, ion-trap, photonic, and spin qubits. Discuss their advantages and limitations.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. Introduction</h3>
+                <p>A physical qubit can be any two-level quantum mechanical system. Different hardware platforms use different physical phenomena to define the states $|0\rangle$ and $|1\rangle$.</p>
+
+                <h3 class="section-title">2. Comparison of Qubit Technologies</h3>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Superconducting</th>
+                                <th>Ion-Trap</th>
+                                <th>Photonic</th>
+                                <th>Spin Qubits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Physical Basis</strong></td>
+                                <td>Josephson Junctions</td>
+                                <td>Trapped ions (EM fields)</td>
+                                <td>Photons in waveguides</td>
+                                <td>Electron spins in quantum dots</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coherence Time</strong></td>
+                                <td>Short (μs to ms)</td>
+                                <td>Very Long (seconds)</td>
+                                <td>N/A (Flight time)</td>
+                                <td>Medium (ms)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gate Speed</strong></td>
+                                <td>Very Fast (ns)</td>
+                                <td>Slow (μs)</td>
+                                <td>Very Fast</td>
+                                <td>Fast</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scalability</strong></td>
+                                <td>High (Lithography)</td>
+                                <td>Medium (Trap limits)</td>
+                                <td>High (Integrated chips)</td>
+                                <td>Very High (Silicon)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Operating Temp</strong></td>
+                                <td>mK (Near Absolute Zero)</td>
+                                <td>Room Temp or Cryo</td>
+                                <td>Room Temperature</td>
+                                <td>Cryogenic</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="section-title">3. Detailed Discussion</h3>
+
+                <h4 class="subsection-title">A. Superconducting Qubits (IBM, Google)</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> Macroscopic LC circuits with Josephson Junctions creating anharmonic oscillators.</li>
+                    <li><strong>Advantages:</strong> Scalable (lithography), fast gates, good qubit coupling.</li>
+                    <li><strong>Limitations:</strong> Sensitive to noise, requires expensive dilution refrigerators, crosstalk issues.</li>
+                </ul>
+
+                <h4 class="subsection-title">B. Ion-Trap Qubits (IonQ, Honeywell)</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> Ionized atoms trapped in free space using EM fields; states defined by hyperfine levels.</li>
+                    <li><strong>Advantages:</strong> Extremely high fidelity, long coherence, all-to-all connectivity.</li>
+                    <li><strong>Limitations:</strong> Slow gate operations, difficult to scale (trap size limits).</li>
+                </ul>
+
+                <h4 class="subsection-title">C. Photonic Qubits (Xanadu, PsiQuantum)</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> Information encoded in photon properties (polarization, path).</li>
+                    <li><strong>Advantages:</strong> Room temperature operation, ideal for quantum communication, no decoherence.</li>
+                    <li><strong>Limitations:</strong> Photon loss, two-qubit gates are probabilistic and difficult.</li>
+                </ul>
+
+                <h4 class="subsection-title">D. Spin Qubits (Intel)</h4>
+                <ul>
+                    <li><strong>Mechanism:</strong> Electron spin (↑ or ↓) in semiconductor quantum dots (Silicon).</li>
+                    <li><strong>Advantages:</strong> Extremely small (nanometers), leverages existing silicon industry.</li>
+                    <li><strong>Limitations:</strong> Variability requires complex tuning, challenging single-spin readout.</li>
+                </ul>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">Physical Qubit Representations</p>
+                    <svg width="600" height="200" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow5" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L6,3 z" fill="white"/>
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+
+                        <!-- Superconducting -->
+                        <g transform="translate(35, 30)">
+                            <text x="50" y="0" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">Superconducting</text>
+                            <rect x="10" y="15" width="80" height="80" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+                            <line x1="25" y1="55" x2="45" y2="55" stroke="#f59e0b" stroke-width="4"/>
+                            <line x1="55" y1="55" x2="75" y2="55" stroke="#f59e0b" stroke-width="4"/>
+                            <rect x="43" y="45" width="14" height="20" rx="2" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                            <line x1="45" y1="48" x2="55" y2="62" stroke="#3b82f6" stroke-width="2"/>
+                            <line x1="55" y1="48" x2="45" y2="62" stroke="#3b82f6" stroke-width="2"/>
+                            <text x="50" y="115" font-family="Arial" font-size="10" text-anchor="middle" fill="#64748b">Circuit (Chip)</text>
+                        </g>
+
+                        <!-- Ion-Trap -->
+                        <g transform="translate(165, 30)">
+                            <text x="50" y="0" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">Ion-Trap</text>
+                            <rect x="10" y="15" width="80" height="80" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+                            <line x1="15" y1="35" x2="85" y2="35" stroke="#64748b" stroke-width="3"/>
+                            <line x1="15" y1="75" x2="85" y2="75" stroke="#64748b" stroke-width="3"/>
+                            <circle cx="30" cy="55" r="8" fill="#8b5cf6"/>
+                            <circle cx="50" cy="55" r="8" fill="#8b5cf6"/>
+                            <circle cx="70" cy="55" r="8" fill="#8b5cf6"/>
+                            <text x="50" y="115" font-family="Arial" font-size="10" text-anchor="middle" fill="#64748b">Levitating Ions</text>
+                        </g>
+
+                        <!-- Photonic -->
+                        <g transform="translate(295, 30)">
+                            <text x="50" y="0" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">Photonic</text>
+                            <rect x="10" y="15" width="80" height="80" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+                            <line x1="15" y1="55" x2="85" y2="55" stroke="#1e293b" stroke-width="2"/>
+                            <path d="M 15 55 Q 30 30 45 55 T 75 55" stroke="#f97316" stroke-width="3" fill="none"/>
+                            <circle cx="80" cy="55" r="6" fill="#f97316"/>
+                            <text x="50" y="115" font-family="Arial" font-size="10" text-anchor="middle" fill="#64748b">Light/Waveguide</text>
+                        </g>
+
+                        <!-- Spin Qubit -->
+                        <g transform="translate(425, 30)">
+                            <text x="50" y="0" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">Spin Qubit</text>
+                            <rect x="10" y="15" width="80" height="80" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+                            <rect x="25" y="30" width="50" height="50" rx="4" fill="#60a5fa" stroke="#3b82f6"/>
+                            <circle cx="50" cy="55" r="12" fill="#1e293b"/>
+                            <line x1="50" y1="55" x2="50" y2="38" stroke="white" stroke-width="3" marker-end="url(#arrow5)"/>
+                            <text x="50" y="115" font-family="Arial" font-size="10" text-anchor="middle" fill="#64748b">Electron Spin</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 7 -->
+        <article class="question-card" id="q7">
+            <div class="question-header">
+                <span class="question-number">7</span>
+                <h2>Discuss the challenges in scaling quantum hardware. Highlight issues such as gate fidelity, decoherence time, and crosstalk.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. Introduction</h3>
+                <p>While we can build small quantum computers (50-100 qubits), building a large-scale, fault-tolerant device with millions of qubits is extremely difficult. The main hurdles are maintaining the fragile quantum state while increasing the system size.</p>
+
+                <h3 class="section-title">2. Key Challenges</h3>
+
+                <h4 class="subsection-title">A. Gate Fidelity (Error Rates)</h4>
+                <ul>
+                    <li><strong>Problem:</strong> Quantum gates are analog operations (rotations). Unlike digital logic, they are never perfect. Current gate fidelities are around 99% to 99.9%.</li>
+                    <li><strong>Impact:</strong> Errors accumulate rapidly. If a gate is 99% accurate, applying 100 gates results in a success probability of $0.99^{100} \approx 36\%$. Most outputs become random noise.</li>
+                    <li><strong>Requirement:</strong> Fidelities must cross the <strong>Fault-Tolerance Threshold</strong> (typically >99.9% or error rates <$10^{-3}$).</li>
+                </ul>
+
+                <h4 class="subsection-title">B. Decoherence Time (Lifetime)</h4>
+                <ul>
+                    <li><strong>Problem:</strong> Qubits inevitably interact with their environment, losing quantum information over time.</li>
+                    <li><strong>Impact:</strong> Calculations must be completed within the <strong>Coherence Time</strong> ($T_1$ and $T_2$).</li>
+                    <li><strong>Scaling Issue:</strong> As we add more qubits, the probability of <em>at least one</em> qubit decohering increases.</li>
+                </ul>
+
+                <h4 class="subsection-title">C. Crosstalk</h4>
+                <ul>
+                    <li><strong>Problem:</strong> In dense chips, operations on one qubit accidentally affect neighbors.</li>
+                    <li><strong>Impact:</strong> Introduces correlated errors that are very hard for QEC to fix.</li>
+                    <li><strong>Scaling Issue:</strong> More qubits = worse crosstalk, requiring complex isolation.</li>
+                </ul>
+
+                <h4 class="subsection-title">D. Wiring and Control (The Interconnect Bottleneck)</h4>
+                <ul>
+                    <li><strong>Problem:</strong> Each qubit typically requires individual control lines (wires).</li>
+                    <li><strong>Impact:</strong> For superconducting chips at millikelvin temperatures, thousands of wires introduce heat.</li>
+                    <li><strong>Scaling Issue:</strong> We cannot physically fit or cool millions of wires. Solutions like "multiplexing" or on-chip controllers are required.</li>
+                </ul>
+
+                <h3 class="section-title">3. Summary Table</h3>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Challenge</th>
+                                <th>Definition</th>
+                                <th>Scaling Consequence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Gate Fidelity</strong></td>
+                                <td>Accuracy of logic operations</td>
+                                <td>Limits circuit depth (algorithm length)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Decoherence</strong></td>
+                                <td>Lifetime of the quantum state</td>
+                                <td>Limits computation time</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Crosstalk</strong></td>
+                                <td>Unwanted qubit interactions</td>
+                                <td>Introduces correlated errors (breaks QEC)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Wiring</strong></td>
+                                <td>Physical connections to qubits</td>
+                                <td>Heat load limits total qubit count</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="diagram-container">
+                    <p class="diagram-title">The Scaling Bottleneck</p>
+                    <svg width="400" height="280" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/>
+                            </marker>
+                            <marker id="arrow6b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L8,3 z" fill="#8b5cf6"/>
+                            </marker>
+                        </defs>
+                        <rect width="100%" height="100%" fill="#f8fafc" rx="8"/>
+
+                        <!-- Qubit grid -->
+                        <g transform="translate(140, 80)">
+                            <rect x="0" y="0" width="50" height="50" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2"/>
+                            <text x="25" y="30" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Q1</text>
+
+                            <rect x="70" y="0" width="50" height="50" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2"/>
+                            <text x="95" y="30" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Q2</text>
+
+                            <rect x="0" y="70" width="50" height="50" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2"/>
+                            <text x="25" y="100" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Q3</text>
+
+                            <rect x="70" y="70" width="50" height="50" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2"/>
+                            <text x="95" y="100" font-family="Arial" font-size="12" text-anchor="middle" fill="white" font-weight="bold">Q4</text>
+
+                            <!-- Crosstalk -->
+                            <path d="M 50 25 L 68 25" stroke="#ef4444" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow6)"/>
+                            <text x="60" y="18" font-family="Arial" font-size="9" fill="#ef4444" text-anchor="middle">Crosstalk</text>
+
+                            <!-- Environment -->
+                            <text x="145" y="50" font-family="Arial" font-size="11" fill="#8b5cf6" font-weight="bold">Environment</text>
+                            <path d="M 130 55 L 125 70" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow6b)"/>
+                            <text x="155" y="75" font-family="Arial" font-size="9" fill="#8b5cf6">Noise/Heat</text>
+
+                            <!-- Wiring -->
+                            <line x1="25" y1="0" x2="25" y2="-40" stroke="#64748b" stroke-width="2"/>
+                            <line x1="95" y1="0" x2="95" y2="-40" stroke="#64748b" stroke-width="2"/>
+                            <line x1="25" y1="120" x2="25" y2="160" stroke="#64748b" stroke-width="2"/>
+                            <line x1="95" y1="120" x2="95" y2="160" stroke="#64748b" stroke-width="2"/>
+
+                            <text x="60" y="-50" font-family="Arial" font-size="11" fill="#64748b" text-anchor="middle" font-weight="bold">Massive Wiring ↑</text>
+                        </g>
+
+                        <!-- Gate fidelity note -->
+                        <rect x="110" y="230" width="180" height="35" rx="6" fill="rgba(245,158,11,0.1)" stroke="#f59e0b"/>
+                        <text x="200" y="250" font-family="Arial" font-size="11" text-anchor="middle" fill="#d97706" font-weight="bold">Gate Fidelity: 99% only ⚠️</text>
+                    </svg>
+                </div>
+            </div>
+        </article>
+
+        <!-- Question 8 -->
+        <article class="question-card" id="q8">
+            <div class="question-header">
+                <span class="question-number">8</span>
+                <h2>Explain stabilizer formalism and show how it is used in designing quantum error-correcting codes.</h2>
+            </div>
+            <div class="answer-content">
+                <h3 class="section-title">1. Stabilizer Formalism</h3>
+                <p>Stabilizer formalism is a powerful mathematical framework for describing quantum states and QEC codes. Instead of describing a quantum state using amplitudes (which grow as $2^n$), we describe it by the <strong>operators</strong> that leave it unchanged.</p>
+
+                <div class="concept-box">
+                    <h4>Definition</h4>
+                    <p>A state |ψ⟩ is <strong>stabilized</strong> by an operator S if:</p>
+                    <div class="formula">S|ψ⟩ = +1|ψ⟩</div>
+                    <p>This means |ψ⟩ is an eigenvector of S with eigenvalue +1.</p>
+                </div>
+
+                <div class="info-box">
+                    <h4>The Stabilizer Group</h4>
+                    <p>For an n-qubit system, the stabilizer group 𝒮 is a subgroup of the Pauli Group (Pₙ = {I, X, Y, Z}⊗ⁿ) such that:</p>
+                    <ul>
+                        <li>All elements commute (AB = BA)</li>
+                        <li>-I is not in the group</li>
+                        <li>The group is closed under multiplication</li>
+                    </ul>
+                </div>
+
+                <p><strong>Code Space:</strong> The quantum code (logical states) is defined as the unique subspace V<sub>S</sub> fixed by all operators in 𝒮.</p>
+
+                <h3 class="section-title">2. Designing QEC Codes with Stabilizers</h3>
+                <p>Designing a code involves choosing a set of <strong>Generators</strong> (g₁, g₂, ...) that define the logical subspace. These generators determine the code's error-correcting properties.</p>
+
+                <div class="step-box">
+                    <h4>Step 1: Choose Generators (Syndromes)</h4>
+                    <p>We select operators that check parity relationships between qubits without measuring the qubits individually.</p>
+                    <div class="example-box">
+                        <strong>Example (3-Qubit Bit-Flip Code):</strong>
+                        <p>We want to protect the subspace spanned by |000⟩ and |111⟩.</p>
+                        <ul>
+                            <li><strong>Generator g₁ = Z₁Z₂I:</strong> Checks parity of qubits 1 and 2</li>
+                            <li><strong>Generator g₂ = IZ₂Z₃:</strong> Checks parity of qubits 2 and 3</li>
+                        </ul>
+                        <p>Both operators stabilize |000⟩ and |111⟩ (return +1).</p>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2: Error Detection (Commutation)</h4>
+                    <p>An error E is detected if it <strong>anti-commutes</strong> with any stabilizer generator (Egᵢ = -gᵢE).</p>
+                    <ul>
+                        <li>If we measure the generator gᵢ and get outcome <span class="highlight">+1</span>, no error (or undetected error) occurred relative to that check.</li>
+                        <li>If we get outcome <span class="highlight-error">-1</span>, an error has occurred. The pattern of -1s is the <strong>Syndrome</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 3: Logical Operators</h4>
+                    <p>Logical operations (X̄, Z̄) are Pauli operators that commute with the stabilizers but are not part of the stabilizer group itself.</p>
+                </div>
+
+                <h3 class="section-title">3. Example: 3-Qubit Bit-Flip Detection</h3>
+                <p>Let the code be stabilized by S = {I, Z₁Z₂, Z₂Z₃}.</p>
+                
+                <div class="example-box">
+                    <p>Suppose a Bit-Flip error X₁ occurs on Qubit 1:</p>
+                    <ol>
+                        <li><strong>Check with g₁ = Z₁Z₂:</strong> X₁ anti-commutes with Z₁ (XZ = -ZX). Thus, measurement of g₁ yields <span class="highlight-error">-1</span>.</li>
+                        <li><strong>Check with g₂ = Z₂Z₃:</strong> X₁ commutes with I, Z₂, Z₃. Measurement of g₂ yields <span class="highlight">+1</span>.</li>
+                    </ol>
+                    <p><strong>Syndrome:</strong> (-1, +1)</p>
+                    <p><strong>Conclusion:</strong> The unique syndrome (-1, +1) tells us the error is on Qubit 1. We apply X₁ to correct it.</p>
+                </div>
+
+                <h3 class="section-title">Diagram: Stabilizer Measurement Circuit</h3>
+                <div class="diagram-container">
+                    <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#1a1a2e" />
+                        
+                        <!-- Title -->
+                        <text x="300" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#00d4ff" text-anchor="middle">Measuring Stabilizer Z₁Z₂</text>
+                        
+                        <!-- Qubit lines -->
+                        <line x1="50" y1="60" x2="520" y2="60" stroke="#4a9eff" stroke-width="2" />
+                        <text x="25" y="65" font-family="Arial" font-size="12" fill="#ffffff">q₁</text>
+                        
+                        <line x1="50" y1="100" x2="520" y2="100" stroke="#4a9eff" stroke-width="2" />
+                        <text x="25" y="105" font-family="Arial" font-size="12" fill="#ffffff">q₂</text>
+                        
+                        <line x1="50" y1="140" x2="520" y2="140" stroke="#4a9eff" stroke-width="2" />
+                        <text x="25" y="145" font-family="Arial" font-size="12" fill="#ffffff">q₃</text>
+                        
+                        <line x1="50" y1="190" x2="520" y2="190" stroke="#ff6b6b" stroke-width="2" />
+                        <text x="25" y="195" font-family="Arial" font-size="12" fill="#ff6b6b">Anc</text>
+                        
+                        <!-- First Hadamard on Ancilla -->
+                        <rect x="80" y="175" width="30" height="30" rx="5" fill="#2d2d44" stroke="#00d4ff" stroke-width="2" />
+                        <text x="95" y="195" font-family="Arial" font-size="14" font-weight="bold" fill="#00d4ff" text-anchor="middle">H</text>
+                        
+                        <!-- First CNOT (Ancilla controls q1) -->
+                        <line x1="170" y1="60" x2="170" y2="190" stroke="#ffd93d" stroke-width="2" />
+                        <circle cx="170" cy="190" r="6" fill="#ffd93d" />
+                        <circle cx="170" cy="60" r="12" fill="none" stroke="#ffd93d" stroke-width="2" />
+                        <line x1="170" y1="48" x2="170" y2="72" stroke="#ffd93d" stroke-width="2" />
+                        <line x1="158" y1="60" x2="182" y2="60" stroke="#ffd93d" stroke-width="2" />
+                        
+                        <!-- Second CNOT (Ancilla controls q2) -->
+                        <line x1="250" y1="100" x2="250" y2="190" stroke="#ffd93d" stroke-width="2" />
+                        <circle cx="250" cy="190" r="6" fill="#ffd93d" />
+                        <circle cx="250" cy="100" r="12" fill="none" stroke="#ffd93d" stroke-width="2" />
+                        <line x1="250" y1="88" x2="250" y2="112" stroke="#ffd93d" stroke-width="2" />
+                        <line x1="238" y1="100" x2="262" y2="100" stroke="#ffd93d" stroke-width="2" />
+                        
+                        <!-- Second Hadamard on Ancilla -->
+                        <rect x="320" y="175" width="30" height="30" rx="5" fill="#2d2d44" stroke="#00d4ff" stroke-width="2" />
+                        <text x="335" y="195" font-family="Arial" font-size="14" font-weight="bold" fill="#00d4ff" text-anchor="middle">H</text>
+                        
+                        <!-- Measurement -->
+                        <rect x="400" y="175" width="40" height="30" rx="5" fill="#6c5ce7" stroke="#a29bfe" stroke-width="2" />
+                        <path d="M 410 195 A 10 10 0 0 1 430 195" stroke="#ffffff" stroke-width="2" fill="none" />
+                        <line x1="420" y1="195" x2="425" y2="182" stroke="#ffffff" stroke-width="2" />
+                        
+                        <!-- Syndrome output -->
+                        <text x="470" y="190" font-family="Arial" font-size="12" fill="#00ff88">Syndrome</text>
+                        <text x="470" y="208" font-family="Arial" font-size="11" fill="#ff6b6b">(+1 or -1)</text>
+                        
+                        <!-- Labels -->
+                        <text x="170" y="220" font-family="Arial" font-size="10" fill="#aaaaaa" text-anchor="middle">CZ₁</text>
+                        <text x="250" y="220" font-family="Arial" font-size="10" fill="#aaaaaa" text-anchor="middle">CZ₂</text>
+                    </svg>
+                </div>
+
+                <div class="summary-box">
+                    <h4>Key Takeaways</h4>
+                    <ul>
+                        <li><strong>Stabilizers</strong> define the code space as the +1 eigenspace of a set of commuting Pauli operators</li>
+                        <li><strong>Syndrome measurement</strong> checks which stabilizers return -1, identifying errors</li>
+                        <li><strong>Error correction</strong> applies the appropriate Pauli operator based on the syndrome</li>
+                        <li>This framework underlies most modern QEC codes including the Surface Code</li>
+                    </ul>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <footer>
+        <p>© 2025 Quantum Computing Study Guide | Built for Learning</p>
+    </footer>
+
+    <button class="scroll-top" id="backToTop" aria-label="Back to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+        const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+        const html = document.documentElement;
+
+        // Check local storage
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', currentTheme);
+        updateIcons(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons(newTheme);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        // Back to top button functionality
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // KaTeX Configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>
